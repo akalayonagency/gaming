@@ -30,6 +30,13 @@
       --shadow: 0 18px 40px rgba(0,0,0,.45);
       --inner: inset 0 1px 0 rgba(255,255,255,.16), inset 0 -18px 40px rgba(0,0,0,.35);
       --r: 22px;
+
+      /* Grid sizing (modifiable by JS for 3x2) */
+      --cols: 5;
+      --blur: 16px;
+      --cellMin: 110px;
+      --cellMax: 1fr;
+      --gap: 26px;
     }
 
     *{ box-sizing:border-box; }
@@ -39,7 +46,6 @@
       color: var(--text);
       min-height:100vh;
 
-      /* fond neutre (ta page peut avoir son propre fond) */
       background:
         radial-gradient(900px 500px at 70% 15%, rgba(255,60,90,.18), transparent 60%),
         radial-gradient(900px 500px at 20% 75%, rgba(255,255,255,.06), transparent 60%),
@@ -297,14 +303,14 @@
     .grid{
       position:absolute; inset: 40px;
       display:grid;
-      gap: 26px;
+      gap: var(--gap);
       align-content:center;
       justify-content:center;
-      grid-template-columns: repeat(var(--cols), minmax(110px, 1fr));
+      grid-template-columns: repeat(var(--cols), minmax(var(--cellMin), var(--cellMax)));
     }
 
     @media (max-width: 980px){
-      .grid{ inset: 18px; gap: 16px; }
+      .grid{ inset: 18px; }
     }
 
     .cell{
@@ -314,7 +320,6 @@
       overflow:hidden;
       cursor:pointer;
 
-      /* --- GLASSMORPHISM --- */
       background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.06));
       border: 1px solid rgba(255,255,255,.18);
       box-shadow: 0 14px 30px rgba(0,0,0,.42), var(--inner);
@@ -401,7 +406,7 @@
         <label>🎁 2) Choisir un cadeau</label>
         <select id="giftSelect"></select>
 
-        <div class="giftPreview" id="giftPreview">
+        <div class="giftPreview">
           <div class="thumb" id="giftThumb"></div>
           <div class="meta">
             <div class="name" id="giftName">Aucun cadeau sélectionné</div>
@@ -414,8 +419,8 @@
         </div>
 
         <div class="hint">
-          ⚠️ Les images sont chargées depuis <b>./gifts/</b>.  
-          Tu ajoutes tes PNG et tu complètes la liste <span class="kbd">GIFTS</span> dans le code.
+          ✅ Les PNG sont à côté de <b>index.html</b> (racine du repo).  
+          Donc le code charge <span class="kbd">./rose.png</span> etc.
         </div>
       </div>
 
@@ -426,7 +431,7 @@
           <div style="flex:1; min-width: 150px;">
             <label style="margin-bottom:6px;">Disposition</label>
             <select id="layout">
-              <option value="3x2">3 colonnes × 2 lignes (6)</option>
+              <option value="3x2">3 colonnes × 2 lignes (6) — petit</option>
               <option value="5x2">5 colonnes × 2 lignes (10)</option>
               <option value="5x3" selected>5 colonnes × 3 lignes (15)</option>
               <option value="4x3">4 colonnes × 3 lignes (12)</option>
@@ -456,9 +461,6 @@
           <button class="btn danger" id="resetGrid">Vider toutes les cases</button>
           <button class="btn primary" id="exportPng">Exporter en PNG</button>
         </div>
-        <div class="hint">
-          📦 L’export sort l’overlay tel que tu le vois (fond + cases + cadeaux).
-        </div>
       </div>
     </div>
 
@@ -482,20 +484,20 @@
 
   <script>
     /**
-     * ✅ BANQUE DE CADEAUX (à toi de remplir)
-     * Mets tes PNG dans le dossier:  ./gifts/
-     * Exemple: ./gifts/rose.png
+     * ✅ Tes fichiers en RACINE (même niveau que index.html)
      */
     const GIFTS = [
-      { name: "Rose", file: "rose.png" },
-      { name: "Cœur", file: "coeur.png" },
+      { name: "Cœur du jour", file: "coeurdujour.png" },
+      { name: "Ice Cream", file: "ice-cream.png" },
+      { name: "Adore", file: "adore.png" },
+      { name: "Glow", file: "glow.png" },
+      { name: "Gâteau Part", file: "gateaupart.png" },
+      { name: "2026", file: "2026.png" },
       { name: "TikTok", file: "tiktok.png" },
-      { name: "Lune", file: "lune.png" },
-      // Ajoute autant que tu veux ↓
-      // { name: "Galaxy", file: "galaxy.png" },
+      { name: "Rose", file: "rose.png" },
+      { name: "G9", file: "g9.png" },
     ];
 
-    // --- State ---
     const state = {
       selectedGiftUrl: null,
       selectedGiftName: null,
@@ -504,18 +506,18 @@
       rows: 3,
       blur: 16,
       round: 22,
+      cellMin: 110,
+      cellMax: '1fr',
+      gap: 26
     };
 
-    // --- Elements ---
     const bg = document.getElementById('bg');
     const bgInput = document.getElementById('bgInput');
     const clearBgBtn = document.getElementById('clearBg');
 
     const giftSelect = document.getElementById('giftSelect');
-    const giftPreview = document.getElementById('giftPreview');
     const giftThumb = document.getElementById('giftThumb');
     const giftName = document.getElementById('giftName');
-
     const deselectBtn = document.getElementById('deselect');
 
     const layout = document.getElementById('layout');
@@ -531,20 +533,37 @@
     const resetGridBtn = document.getElementById('resetGrid');
     const exportBtn = document.getElementById('exportPng');
 
-    // --- Helpers ---
     function setCSSVars(){
-      grid.style.setProperty('--cols', state.cols);
-      grid.style.setProperty('--blur', state.blur + 'px');
+      document.documentElement.style.setProperty('--cols', state.cols);
+      document.documentElement.style.setProperty('--blur', state.blur + 'px');
       document.documentElement.style.setProperty('--r', state.round + 'px');
+      document.documentElement.style.setProperty('--cellMin', state.cellMin + 'px');
+      document.documentElement.style.setProperty('--cellMax', state.cellMax);
+      document.documentElement.style.setProperty('--gap', state.gap + 'px');
 
       blurVal.textContent = state.blur;
       roundVal.textContent = state.round;
+    }
+
+    function tuneGridForLayout(c, r){
+      state.cellMin = 110;
+      state.cellMax = '1fr';
+      state.gap = 26;
+
+      if(c === 3 && r === 2){
+        state.cellMin = 36;
+        state.cellMax = '70px';
+        state.gap = 10;
+      }
     }
 
     function setLayout(value){
       const [c, r] = value.split('x').map(Number);
       state.cols = c;
       state.rows = r;
+
+      tuneGridForLayout(c, r);
+
       state.cells = new Array(c * r).fill(null);
       renderGrid();
       setCSSVars();
@@ -558,7 +577,7 @@
         renderGrid();
         return;
       }
-      const url = `./gifts/${gift.file}`;
+      const url = `./${gift.file}`; // ✅ RACINE
       state.selectedGiftUrl = url;
       state.selectedGiftName = gift.name;
       renderGiftPreview();
@@ -620,14 +639,12 @@
           cell.appendChild(empty);
         }
 
-        // click = place if selected
         cell.addEventListener('click', () => {
           if(!state.selectedGiftUrl) return;
           state.cells[i] = state.selectedGiftUrl;
           renderGrid();
         });
 
-        // dblclick = remove
         cell.addEventListener('dblclick', () => {
           state.cells[i] = null;
           renderGrid();
@@ -637,7 +654,6 @@
       }
     }
 
-    // --- Background upload ---
     bgInput.addEventListener('change', (e) => {
       const file = e.target.files?.[0];
       if(!file) return;
@@ -650,7 +666,6 @@
       bgInput.value = '';
     });
 
-    // --- Gift selection ---
     giftSelect.addEventListener('change', () => {
       const v = giftSelect.value;
       if(v === ''){
@@ -658,8 +673,7 @@
         return;
       }
       const idx = Number(v);
-      const gift = GIFTS[idx];
-      setSelectedGift(gift);
+      setSelectedGift(GIFTS[idx]);
     });
 
     deselectBtn.addEventListener('click', () => {
@@ -667,7 +681,6 @@
       setSelectedGift(null);
     });
 
-    // --- Controls ---
     layout.addEventListener('change', (e) => setLayout(e.target.value));
 
     blurRange.addEventListener('input', (e) => {
@@ -685,13 +698,11 @@
       renderGrid();
     });
 
-    // --- Export PNG ---
     exportBtn.addEventListener('click', async () => {
       try{
         exportBtn.disabled = true;
         exportBtn.textContent = "⏳ Export en cours...";
 
-        // important: scale pour plus de qualité
         const canvas = await html2canvas(stage, {
           backgroundColor: null,
           useCORS: true,
@@ -706,7 +717,7 @@
         a.click();
         a.remove();
       } catch(err){
-        alert("Export impossible (vérifie que tes images dans ./gifts/ sont accessibles).");
+        alert("Export impossible (vérifie que les fichiers PNG sont bien accessibles sur GitHub Pages).");
         console.error(err);
       } finally {
         exportBtn.disabled = false;
@@ -714,7 +725,7 @@
       }
     });
 
-    // --- Init ---
+    // Init
     renderGiftSelect();
     setLayout(layout.value);
 
@@ -722,13 +733,11 @@
     state.round = Number(roundRange.value);
     setCSSVars();
 
-    // Optionnel: auto-sélectionner le 1er cadeau si tu veux
-    // giftSelect.value = "0";
-    // setSelectedGift(GIFTS[0]);
-
     renderGiftPreview();
     renderGrid();
   </script>
 </body>
+</html>
+
 </html>
 
