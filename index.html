@@ -3,18 +3,32 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Glass Overlay Creator</title>
+  <title>Créateur d'overlay By Akatsuki Orga.</title>
+
+  <!-- Export PNG (canvas) -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
   <style>
     :root{
-      --bg: #0b1020;
-      --panel: rgba(255,255,255,.08);
-      --panel-2: rgba(255,255,255,.12);
-      --stroke: rgba(255,255,255,.18);
-      --stroke-2: rgba(255,255,255,.28);
+      --bg: #07060a;
+
+      /* Akatsuki palette */
+      --red: rgba(255, 60, 90, 1);
+      --redSoft: rgba(255, 60, 90, .22);
+      --redGlow: rgba(255, 60, 90, .18);
+
       --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.72);
-      --shadow: 0 18px 40px rgba(0,0,0,.40);
-      --inner: inset 0 1px 0 rgba(255,255,255,.20), inset 0 -18px 40px rgba(0,0,0,.35);
+      --muted: rgba(255,255,255,.70);
+
+      /* Transparent menu */
+      --menu: rgba(0,0,0,.18);
+      --menu2: rgba(0,0,0,.10);
+
+      --stroke: rgba(255,255,255,.16);
+      --strokeRed: rgba(255, 60, 90, .35);
+
+      --shadow: 0 18px 40px rgba(0,0,0,.45);
+      --inner: inset 0 1px 0 rgba(255,255,255,.16), inset 0 -18px 40px rgba(0,0,0,.35);
       --r: 22px;
     }
 
@@ -22,11 +36,14 @@
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(900px 500px at 70% 15%, rgba(95,170,255,.28), transparent 60%),
-                  radial-gradient(900px 500px at 20% 75%, rgba(255,110,180,.18), transparent 60%),
-                  var(--bg);
       color: var(--text);
       min-height:100vh;
+
+      /* fond neutre (ta page peut avoir son propre fond) */
+      background:
+        radial-gradient(900px 500px at 70% 15%, rgba(255,60,90,.18), transparent 60%),
+        radial-gradient(900px 500px at 20% 75%, rgba(255,255,255,.06), transparent 60%),
+        var(--bg);
     }
 
     .app{
@@ -42,12 +59,16 @@
       .app{ grid-template-columns: 1fr; }
     }
 
+    /* MENU TRANSPARENT (glass) */
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
-      border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, var(--menu), var(--menu2));
+      border: 1px solid var(--strokeRed);
       border-radius: 24px;
       box-shadow: var(--shadow);
       overflow:hidden;
+
+      backdrop-filter: blur(14px) saturate(1.15);
+      -webkit-backdrop-filter: blur(14px) saturate(1.15);
     }
 
     .sidebar{
@@ -59,25 +80,28 @@
 
     .title{
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:space-between;
       gap:12px;
       margin-bottom: 10px;
     }
 
     .title h1{
-      font-size: 16px;
+      font-size: 15px;
+      line-height: 1.25;
       margin:0;
       letter-spacing:.2px;
     }
 
     .badge{
       font-size: 12px;
-      color: var(--muted);
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.14);
+      color: rgba(255,255,255,.82);
+      background: rgba(255,60,90,.12);
+      border: 1px solid rgba(255,60,90,.35);
       padding: 6px 10px;
       border-radius: 999px;
+      box-shadow: 0 0 0 3px rgba(255,60,90,.08);
+      white-space:nowrap;
     }
 
     .section{
@@ -103,37 +127,47 @@
     .btn{
       cursor:pointer;
       border: 1px solid rgba(255,255,255,.16);
-      background: rgba(255,255,255,.08);
+      background: rgba(0,0,0,.20);
       color: var(--text);
       padding: 10px 12px;
       border-radius: 14px;
-      font-weight: 600;
-      transition: transform .08s ease, background .15s ease, border-color .15s ease;
+      font-weight: 700;
+      transition: transform .08s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
       text-decoration:none;
       display:inline-flex;
       align-items:center;
       gap: 8px;
       user-select:none;
+
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
-    .btn:hover{ background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.22); }
+    .btn:hover{
+      background: rgba(0,0,0,.28);
+      border-color: rgba(255,255,255,.22);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.06);
+    }
     .btn:active{ transform: translateY(1px); }
 
     .btn.primary{
-      background: linear-gradient(180deg, rgba(90,170,255,.22), rgba(90,170,255,.12));
-      border-color: rgba(90,170,255,.35);
+      background: linear-gradient(180deg, rgba(255,60,90,.20), rgba(255,60,90,.10));
+      border-color: rgba(255,60,90,.38);
+      box-shadow: 0 0 0 3px rgba(255,60,90,.10);
     }
+    .btn.primary:hover{ box-shadow: 0 0 0 3px rgba(255,60,90,.16); }
+
     .btn.danger{
-      background: rgba(255,80,110,.14);
-      border-color: rgba(255,80,110,.25);
+      background: rgba(255,60,90,.12);
+      border-color: rgba(255,60,90,.30);
     }
 
     input[type="file"]{
       width: 100%;
       padding: 10px;
-      background: rgba(255,255,255,.06);
+      background: rgba(0,0,0,.18);
       border: 1px dashed rgba(255,255,255,.20);
       border-radius: 14px;
-      color: var(--muted);
+      color: rgba(255,255,255,.70);
     }
 
     input[type="range"]{ width: 100%; }
@@ -141,53 +175,61 @@
     select{
       width: 100%;
       padding: 10px 12px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,60,90,.28);
       border-radius: 14px;
       color: var(--text);
       outline:none;
+      box-shadow: 0 0 0 3px rgba(255,60,90,.08);
     }
 
     .hint{
       font-size: 12px;
-      color: var(--muted);
+      color: rgba(255,255,255,.72);
       line-height: 1.35;
       margin-top: 8px;
     }
 
-    .library{
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+    .giftPreview{
       margin-top: 10px;
-    }
-
-    .gift{
-      aspect-ratio: 1 / 1;
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      padding: 10px;
       border-radius: 16px;
-      background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.16);
+    }
+    .giftPreview .thumb{
+      width: 54px;
+      height: 54px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
       display:flex;
       align-items:center;
       justify-content:center;
       overflow:hidden;
-      cursor:pointer;
-      position:relative;
-      transition: transform .08s ease, border-color .15s ease, background .15s ease;
+      flex: 0 0 auto;
     }
-    .gift:hover{ background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.20); }
-    .gift:active{ transform: translateY(1px); }
-    .gift.selected{
-      border-color: rgba(120,210,255,.65);
-      box-shadow: 0 0 0 3px rgba(120,210,255,.18);
-      background: rgba(120,210,255,.10);
-    }
-    .gift img{
+    .giftPreview img{
       width: 70%;
       height: 70%;
       object-fit: contain;
-      pointer-events:none;
-      filter: drop-shadow(0 10px 14px rgba(0,0,0,.35));
+      filter: drop-shadow(0 12px 14px rgba(0,0,0,.45));
+    }
+    .giftPreview .meta{
+      display:flex;
+      flex-direction:column;
+      gap: 2px;
+    }
+    .giftPreview .meta .name{
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .giftPreview .meta .sub{
+      font-size: 12px;
+      color: rgba(255,255,255,.70);
     }
 
     .main{
@@ -212,10 +254,26 @@
       flex-wrap:wrap;
     }
 
+    .footer-note{
+      font-size: 12px;
+      color: rgba(255,255,255,.75);
+      opacity:.98;
+    }
+
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New";
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,60,90,.30);
+      background: rgba(255,60,90,.10);
+      color: rgba(255,255,255,.88);
+    }
+
     .stage{
       position:relative;
       border-radius: 26px;
-      border: 1px solid rgba(255,255,255,.14);
+      border: 1px solid rgba(255,60,90,.24);
       overflow:hidden;
       min-height: 560px;
       box-shadow: var(--shadow);
@@ -230,10 +288,9 @@
       transform: scale(1.02);
     }
 
-    /* léger vignettage pour rendre l’effet plus "ciné" */
     .vignette{
       position:absolute; inset:0;
-      background: radial-gradient(1200px 700px at 50% 35%, transparent 40%, rgba(0,0,0,.35) 100%);
+      background: radial-gradient(1200px 700px at 50% 35%, transparent 40%, rgba(0,0,0,.40) 100%);
       pointer-events:none;
     }
 
@@ -259,13 +316,12 @@
 
       /* --- GLASSMORPHISM --- */
       background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.06));
-      border: 1px solid rgba(255,255,255,.20);
-      box-shadow: 0 14px 30px rgba(0,0,0,.40), var(--inner);
+      border: 1px solid rgba(255,255,255,.18);
+      box-shadow: 0 14px 30px rgba(0,0,0,.42), var(--inner);
       backdrop-filter: blur(var(--blur)) saturate(1.2);
       -webkit-backdrop-filter: blur(var(--blur)) saturate(1.2);
     }
 
-    /* reflet “verre” en coin */
     .cell::before{
       content:"";
       position:absolute;
@@ -277,7 +333,6 @@
       pointer-events:none;
     }
 
-    /* petit highlight de bord */
     .cell::after{
       content:"";
       position:absolute; inset:0;
@@ -287,8 +342,8 @@
     }
 
     .cell:hover{
-      border-color: rgba(255,255,255,.34);
-      background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.07));
+      border-color: rgba(255,60,90,.35);
+      box-shadow: 0 14px 30px rgba(0,0,0,.42), var(--inner), 0 0 0 3px rgba(255,60,90,.10);
     }
 
     .cell .giftInCell{
@@ -302,7 +357,7 @@
       width: 100%;
       height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 16px 18px rgba(0,0,0,.45));
+      filter: drop-shadow(0 16px 18px rgba(0,0,0,.50));
     }
 
     .cell .empty{
@@ -311,26 +366,10 @@
       align-items:center;
       justify-content:center;
       font-size: 12px;
-      color: rgba(255,255,255,.55);
+      color: rgba(255,255,255,.58);
       pointer-events:none;
       text-align:center;
-      padding: 8px;
-    }
-
-    .footer-note{
-      font-size: 12px;
-      color: var(--muted);
-      opacity:.95;
-    }
-
-    .kbd{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New";
-      font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.20);
-      color: rgba(255,255,255,.82);
+      padding: 10px;
     }
   </style>
 </head>
@@ -340,12 +379,12 @@
     <!-- SIDEBAR -->
     <div class="card sidebar">
       <div class="title">
-        <h1>Glass Overlay Creator</h1>
-        <div class="badge">verre + cadeaux</div>
+        <h1>Créateur d'overlay By Akatsuki Orga.</h1>
+        <div class="badge">☁️🩸 Akatsuki</div>
       </div>
 
       <div class="section">
-        <label>1) Image de fond</label>
+        <label>🖼️ 1) Image de fond</label>
         <input id="bgInput" type="file" accept="image/*" />
         <div class="row" style="margin-top:10px;">
           <a class="btn primary" href="https://chatgpt.com" target="_blank" rel="noopener">
@@ -354,32 +393,40 @@
           <button class="btn" id="clearBg">Retirer le fond</button>
         </div>
         <div class="hint">
-          Astuce : utilise une image 16:9 (1920×1080) ou plus pour un rendu bien net.
+          ☁️🩸 Conseil : fond en 1920×1080 (ou +) pour une netteté parfaite.
         </div>
       </div>
 
       <div class="section">
-        <label>2) Importer des cadeaux (PNG transparents)</label>
-        <input id="giftInput" type="file" accept="image/png,image/webp,image/*" multiple />
-        <div class="hint">
-          Tu peux importer un pack de PNG (cadeaux TikTok). Ensuite clique sur un cadeau,
-          puis clique sur une case pour le placer.
-        </div>
+        <label>🎁 2) Choisir un cadeau</label>
+        <select id="giftSelect"></select>
 
-        <div class="library" id="library"></div>
+        <div class="giftPreview" id="giftPreview">
+          <div class="thumb" id="giftThumb"></div>
+          <div class="meta">
+            <div class="name" id="giftName">Aucun cadeau sélectionné</div>
+            <div class="sub">Clique sur une case pour placer • <span class="kbd">Double-clic</span> pour retirer</div>
+          </div>
+        </div>
 
         <div class="row" style="margin-top:10px;">
-          <button class="btn danger" id="clearGifts">Vider la banque</button>
           <button class="btn" id="deselect">Désélectionner</button>
+        </div>
+
+        <div class="hint">
+          ⚠️ Les images sont chargées depuis <b>./gifts/</b>.  
+          Tu ajoutes tes PNG et tu complètes la liste <span class="kbd">GIFTS</span> dans le code.
         </div>
       </div>
 
       <div class="section">
-        <label>3) Réglages des cases “verre”</label>
+        <label>🧊 3) Réglages des cases “verre”</label>
+
         <div class="row" style="width:100%;">
           <div style="flex:1; min-width: 150px;">
             <label style="margin-bottom:6px;">Disposition</label>
             <select id="layout">
+              <option value="3x2">3 colonnes × 2 lignes (6)</option>
               <option value="5x2">5 colonnes × 2 lignes (10)</option>
               <option value="5x3" selected>5 colonnes × 3 lignes (15)</option>
               <option value="4x3">4 colonnes × 3 lignes (12)</option>
@@ -389,28 +436,28 @@
         </div>
 
         <div style="margin-top:12px;">
-          <label>Flou (blur) : <span id="blurVal">16</span>px</label>
+          <label>🌫️ Flou (blur) : <span id="blurVal">16</span>px</label>
           <input id="blur" type="range" min="0" max="30" value="16" />
         </div>
 
         <div style="margin-top:12px;">
-          <label>Arrondi : <span id="roundVal">22</span>px</label>
+          <label>⭕ Arrondi : <span id="roundVal">22</span>px</label>
           <input id="round" type="range" min="8" max="40" value="22" />
         </div>
 
         <div class="hint">
-          Raccourci : clic sur une case avec un cadeau sélectionné = placer.  
-          Double-clic sur une case = retirer le cadeau.
+          🩸 Flow : choisis un cadeau → clique une case pour le placer.
         </div>
       </div>
 
       <div class="section">
-        <label>4) Nettoyage</label>
+        <label>🧹 4) Actions</label>
         <div class="row">
           <button class="btn danger" id="resetGrid">Vider toutes les cases</button>
+          <button class="btn primary" id="exportPng">Exporter en PNG</button>
         </div>
         <div class="hint">
-          (Option export PNG possible ensuite — si tu veux je te l’ajoute.)
+          📦 L’export sort l’overlay tel que tu le vois (fond + cases + cadeaux).
         </div>
       </div>
     </div>
@@ -420,8 +467,7 @@
       <div class="stage-wrap">
         <div class="stage-toolbar">
           <div class="footer-note">
-            Clique un cadeau → clique une case pour l’ajouter.  
-            <span class="kbd">Double-clic</span> sur une case pour supprimer.
+            ☁️🩸 Clique un cadeau → clique une case pour l’ajouter. <span class="kbd">Double-clic</span> pour supprimer.
           </div>
         </div>
 
@@ -435,11 +481,25 @@
   </div>
 
   <script>
+    /**
+     * ✅ BANQUE DE CADEAUX (à toi de remplir)
+     * Mets tes PNG dans le dossier:  ./gifts/
+     * Exemple: ./gifts/rose.png
+     */
+    const GIFTS = [
+      { name: "Rose", file: "rose.png" },
+      { name: "Cœur", file: "coeur.png" },
+      { name: "TikTok", file: "tiktok.png" },
+      { name: "Lune", file: "lune.png" },
+      // Ajoute autant que tu veux ↓
+      // { name: "Galaxy", file: "galaxy.png" },
+    ];
+
     // --- State ---
     const state = {
       selectedGiftUrl: null,
-      giftItems: [],     // { name, url }
-      cells: [],         // url or null per cell
+      selectedGiftName: null,
+      cells: [],
       cols: 5,
       rows: 3,
       blur: 16,
@@ -451,9 +511,11 @@
     const bgInput = document.getElementById('bgInput');
     const clearBgBtn = document.getElementById('clearBg');
 
-    const giftInput = document.getElementById('giftInput');
-    const library = document.getElementById('library');
-    const clearGiftsBtn = document.getElementById('clearGifts');
+    const giftSelect = document.getElementById('giftSelect');
+    const giftPreview = document.getElementById('giftPreview');
+    const giftThumb = document.getElementById('giftThumb');
+    const giftName = document.getElementById('giftName');
+
     const deselectBtn = document.getElementById('deselect');
 
     const layout = document.getElementById('layout');
@@ -467,6 +529,7 @@
     const roundVal = document.getElementById('roundVal');
 
     const resetGridBtn = document.getElementById('resetGrid');
+    const exportBtn = document.getElementById('exportPng');
 
     // --- Helpers ---
     function setCSSVars(){
@@ -487,34 +550,47 @@
       setCSSVars();
     }
 
-    function renderLibrary(){
-      library.innerHTML = '';
-      state.giftItems.forEach((g, idx) => {
-        const div = document.createElement('div');
-        div.className = 'gift' + (state.selectedGiftUrl === g.url ? ' selected' : '');
-        div.title = g.name || 'cadeau';
-
-        const img = document.createElement('img');
-        img.src = g.url;
-        img.alt = g.name || 'cadeau';
-
-        div.appendChild(img);
-
-        div.addEventListener('click', () => {
-          state.selectedGiftUrl = g.url;
-          renderLibrary();
-        });
-
-        library.appendChild(div);
-      });
-
-      if(state.giftItems.length === 0){
-        library.innerHTML = `
-          <div class="hint" style="grid-column:1/-1; padding:10px; border:1px dashed rgba(255,255,255,.18); border-radius:14px;">
-            Aucun cadeau importé pour l’instant. Importe des PNG via “Importer des cadeaux”.
-          </div>
-        `;
+    function setSelectedGift(gift){
+      if(!gift){
+        state.selectedGiftUrl = null;
+        state.selectedGiftName = null;
+        renderGiftPreview();
+        renderGrid();
+        return;
       }
+      const url = `./gifts/${gift.file}`;
+      state.selectedGiftUrl = url;
+      state.selectedGiftName = gift.name;
+      renderGiftPreview();
+      renderGrid();
+    }
+
+    function renderGiftSelect(){
+      giftSelect.innerHTML = '';
+      const opt0 = document.createElement('option');
+      opt0.value = '';
+      opt0.textContent = '— Aucun (désélectionné) —';
+      giftSelect.appendChild(opt0);
+
+      GIFTS.forEach((g, idx) => {
+        const opt = document.createElement('option');
+        opt.value = String(idx);
+        opt.textContent = `🎁 ${g.name}`;
+        giftSelect.appendChild(opt);
+      });
+    }
+
+    function renderGiftPreview(){
+      giftThumb.innerHTML = '';
+      if(!state.selectedGiftUrl){
+        giftName.textContent = "Aucun cadeau sélectionné";
+        return;
+      }
+      giftName.textContent = state.selectedGiftName || "Cadeau";
+      const img = document.createElement('img');
+      img.src = state.selectedGiftUrl;
+      img.alt = state.selectedGiftName || "cadeau";
+      giftThumb.appendChild(img);
     }
 
     function renderGrid(){
@@ -525,7 +601,6 @@
         const cell = document.createElement('div');
         cell.className = 'cell';
 
-        // contenu
         const url = state.cells[i];
 
         if(url){
@@ -541,7 +616,7 @@
         } else {
           const empty = document.createElement('div');
           empty.className = 'empty';
-          empty.textContent = state.selectedGiftUrl ? 'Clique pour placer' : 'Choisis un cadeau';
+          empty.textContent = state.selectedGiftUrl ? 'Clique pour placer ☁️' : 'Choisis un cadeau 🩸';
           cell.appendChild(empty);
         }
 
@@ -575,37 +650,21 @@
       bgInput.value = '';
     });
 
-    // --- Gift upload (multiple) ---
-    giftInput.addEventListener('change', (e) => {
-      const files = Array.from(e.target.files || []);
-      if(files.length === 0) return;
-
-      const newItems = files.map(f => ({
-        name: f.name,
-        url: URL.createObjectURL(f),
-      }));
-
-      state.giftItems = [...state.giftItems, ...newItems];
-      renderLibrary();
-      // auto-select first new gift if none selected
-      if(!state.selectedGiftUrl && state.giftItems.length){
-        state.selectedGiftUrl = state.giftItems[0].url;
-        renderLibrary();
+    // --- Gift selection ---
+    giftSelect.addEventListener('change', () => {
+      const v = giftSelect.value;
+      if(v === ''){
+        setSelectedGift(null);
+        return;
       }
-    });
-
-    clearGiftsBtn.addEventListener('click', () => {
-      state.giftItems = [];
-      state.selectedGiftUrl = null;
-      giftInput.value = '';
-      renderLibrary();
-      renderGrid();
+      const idx = Number(v);
+      const gift = GIFTS[idx];
+      setSelectedGift(gift);
     });
 
     deselectBtn.addEventListener('click', () => {
-      state.selectedGiftUrl = null;
-      renderLibrary();
-      renderGrid();
+      giftSelect.value = '';
+      setSelectedGift(null);
     });
 
     // --- Controls ---
@@ -626,13 +685,50 @@
       renderGrid();
     });
 
+    // --- Export PNG ---
+    exportBtn.addEventListener('click', async () => {
+      try{
+        exportBtn.disabled = true;
+        exportBtn.textContent = "⏳ Export en cours...";
+
+        // important: scale pour plus de qualité
+        const canvas = await html2canvas(stage, {
+          backgroundColor: null,
+          useCORS: true,
+          scale: 2,
+        });
+
+        const dataUrl = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = `overlay-akatsuki-${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } catch(err){
+        alert("Export impossible (vérifie que tes images dans ./gifts/ sont accessibles).");
+        console.error(err);
+      } finally {
+        exportBtn.disabled = false;
+        exportBtn.textContent = "Exporter en PNG";
+      }
+    });
+
     // --- Init ---
+    renderGiftSelect();
     setLayout(layout.value);
+
     state.blur = Number(blurRange.value);
     state.round = Number(roundRange.value);
     setCSSVars();
-    renderLibrary();
+
+    // Optionnel: auto-sélectionner le 1er cadeau si tu veux
+    // giftSelect.value = "0";
+    // setSelectedGift(GIFTS[0]);
+
+    renderGiftPreview();
     renderGrid();
   </script>
 </body>
 </html>
+
