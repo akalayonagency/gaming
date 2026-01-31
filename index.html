@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Créateur d'overlay By Akatsuki Orga.</title>
 
-  <!-- Export PNG (canvas) -->
+  <!-- Export PNG -->
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
@@ -14,9 +14,6 @@
 
       /* Akatsuki palette */
       --red: rgba(255, 60, 90, 1);
-      --redSoft: rgba(255, 60, 90, .22);
-      --redGlow: rgba(255, 60, 90, .18);
-
       --text: rgba(255,255,255,.92);
       --muted: rgba(255,255,255,.70);
 
@@ -24,22 +21,27 @@
       --menu: rgba(0,0,0,.18);
       --menu2: rgba(0,0,0,.10);
 
-      --stroke: rgba(255,255,255,.16);
       --strokeRed: rgba(255, 60, 90, .35);
 
       --shadow: 0 18px 40px rgba(0,0,0,.45);
       --inner: inset 0 1px 0 rgba(255,255,255,.16), inset 0 -18px 40px rgba(0,0,0,.35);
       --r: 22px;
 
-      /* Grid sizing (modifiable by JS for 3x2) */
+      /* grid vars */
       --cols: 5;
       --blur: 16px;
+      --gap: 26px;
+
+      /* default sizing for most layouts */
       --cellMin: 110px;
       --cellMax: 1fr;
-      --gap: 26px;
+
+      /* special: 3x2 auto-fit */
+      --cellSize: 160px;
     }
 
     *{ box-sizing:border-box; }
+
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -60,7 +62,6 @@
       max-width: 1400px;
       margin: 0 auto;
     }
-
     @media (max-width: 980px){
       .app{ grid-template-columns: 1fr; }
     }
@@ -91,14 +92,12 @@
       gap:12px;
       margin-bottom: 10px;
     }
-
     .title h1{
       font-size: 15px;
       line-height: 1.25;
       margin:0;
       letter-spacing:.2px;
     }
-
     .badge{
       font-size: 12px;
       color: rgba(255,255,255,.82);
@@ -137,7 +136,7 @@
       color: var(--text);
       padding: 10px 12px;
       border-radius: 14px;
-      font-weight: 700;
+      font-weight: 800;
       transition: transform .08s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
       text-decoration:none;
       display:inline-flex;
@@ -175,7 +174,6 @@
       border-radius: 14px;
       color: rgba(255,255,255,.70);
     }
-
     input[type="range"]{ width: 100%; }
 
     select{
@@ -224,19 +222,9 @@
       object-fit: contain;
       filter: drop-shadow(0 12px 14px rgba(0,0,0,.45));
     }
-    .giftPreview .meta{
-      display:flex;
-      flex-direction:column;
-      gap: 2px;
-    }
-    .giftPreview .meta .name{
-      font-weight: 800;
-      font-size: 13px;
-    }
-    .giftPreview .meta .sub{
-      font-size: 12px;
-      color: rgba(255,255,255,.70);
-    }
+    .giftPreview .meta{ display:flex; flex-direction:column; gap: 2px; }
+    .giftPreview .meta .name{ font-weight: 900; font-size: 13px; }
+    .giftPreview .meta .sub{ font-size: 12px; color: rgba(255,255,255,.70); }
 
     .main{
       padding: 16px;
@@ -246,12 +234,7 @@
       min-height: calc(100vh - 36px);
     }
 
-    .stage-wrap{
-      display:flex;
-      flex-direction:column;
-      gap: 10px;
-    }
-
+    .stage-wrap{ display:flex; flex-direction:column; gap: 10px; }
     .stage-toolbar{
       display:flex;
       justify-content:space-between;
@@ -308,9 +291,13 @@
       justify-content:center;
       grid-template-columns: repeat(var(--cols), minmax(var(--cellMin), var(--cellMax)));
     }
-
     @media (max-width: 980px){
       .grid{ inset: 18px; }
+    }
+
+    /* ✅ layout 3x2: taille auto-fit (via --cellSize) */
+    .grid.is-3x2{
+      grid-template-columns: repeat(3, var(--cellSize));
     }
 
     .cell{
@@ -320,29 +307,48 @@
       overflow:hidden;
       cursor:pointer;
 
-      background: linear-gradient(135deg, rgba(255,255,255,.16), rgba(255,255,255,.06));
       border: 1px solid rgba(255,255,255,.18);
       box-shadow: 0 14px 30px rgba(0,0,0,.42), var(--inner);
-      backdrop-filter: blur(var(--blur)) saturate(1.2);
-      -webkit-backdrop-filter: blur(var(--blur)) saturate(1.2);
+
+      /* IMPORTANT: on ne dépend plus de backdrop-filter (export stable) */
+      background: rgba(255,255,255,.10);
     }
 
-    .cell::before{
-      content:"";
+    /* ✅ Faux glass blur capturable par html2canvas */
+    .cell .glass-bg{
       position:absolute;
-      inset: -2px;
-      background:
-        radial-gradient(220px 220px at 15% 10%, rgba(255,255,255,.28), transparent 55%),
-        linear-gradient(135deg, rgba(255,255,255,.18), transparent 40%);
-      opacity: .65;
+      inset: -18px; /* marge pour éviter les bords du blur */
+      background-repeat: no-repeat;
+      transform: scale(1.08);
+      filter: blur(var(--blur)) saturate(1.15);
+      opacity: .85;
+    }
+
+    /* texture “verre” par-dessus */
+    .cell .glass-tint{
+      position:absolute;
+      inset:0;
+      border-radius: var(--r);
+      background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
       pointer-events:none;
     }
 
-    .cell::after{
-      content:"";
+    /* reflet en coin */
+    .cell .glass-shine{
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(220px 220px at 15% 10%, rgba(255,255,255,.28), transparent 55%),
+        linear-gradient(135deg, rgba(255,255,255,.18), transparent 40%);
+      opacity: .55;
+      pointer-events:none;
+    }
+
+    /* highlight bord */
+    .cell .glass-edge{
       position:absolute; inset:0;
       border-radius: var(--r);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.22);
       pointer-events:none;
     }
 
@@ -397,9 +403,7 @@
           </a>
           <button class="btn" id="clearBg">Retirer le fond</button>
         </div>
-        <div class="hint">
-          ☁️🩸 Conseil : fond en 1920×1080 (ou +) pour une netteté parfaite.
-        </div>
+        <div class="hint">☁️🩸 Conseil : 1920×1080 (ou +) pour un rendu net.</div>
       </div>
 
       <div class="section">
@@ -410,7 +414,7 @@
           <div class="thumb" id="giftThumb"></div>
           <div class="meta">
             <div class="name" id="giftName">Aucun cadeau sélectionné</div>
-            <div class="sub">Clique sur une case pour placer • <span class="kbd">Double-clic</span> pour retirer</div>
+            <div class="sub">Clique une case • <span class="kbd">Double-clic</span> = retirer</div>
           </div>
         </div>
 
@@ -419,8 +423,7 @@
         </div>
 
         <div class="hint">
-          ✅ Les PNG sont à côté de <b>index.html</b> (racine du repo).  
-          Donc le code charge <span class="kbd">./rose.png</span> etc.
+          ✅ PNG en racine (même dossier que <b>index.html</b>) : <span class="kbd">./rose.png</span> etc.
         </div>
       </div>
 
@@ -431,17 +434,16 @@
           <div style="flex:1; min-width: 150px;">
             <label style="margin-bottom:6px;">Disposition</label>
             <select id="layout">
-              <option value="3x2">3 colonnes × 2 lignes (6) — petit</option>
+              <option value="3x2">3 colonnes × 2 lignes (6)</option>
               <option value="5x2">5 colonnes × 2 lignes (10)</option>
               <option value="5x3" selected>5 colonnes × 3 lignes (15)</option>
-              <option value="4x3">4 colonnes × 3 lignes (12)</option>
               <option value="6x3">6 colonnes × 3 lignes (18)</option>
             </select>
           </div>
         </div>
 
         <div style="margin-top:12px;">
-          <label>🌫️ Flou (blur) : <span id="blurVal">16</span>px</label>
+          <label>🌫️ Flou : <span id="blurVal">16</span>px</label>
           <input id="blur" type="range" min="0" max="30" value="16" />
         </div>
 
@@ -450,9 +452,7 @@
           <input id="round" type="range" min="8" max="40" value="22" />
         </div>
 
-        <div class="hint">
-          🩸 Flow : choisis un cadeau → clique une case pour le placer.
-        </div>
+        <div class="hint">🩸 Choisis un cadeau → clique une case.</div>
       </div>
 
       <div class="section">
@@ -460,6 +460,9 @@
         <div class="row">
           <button class="btn danger" id="resetGrid">Vider toutes les cases</button>
           <button class="btn primary" id="exportPng">Exporter en PNG</button>
+        </div>
+        <div class="hint">
+          ✅ Export fidèle : même rendu que l’écran (blur stable).
         </div>
       </div>
     </div>
@@ -469,7 +472,7 @@
       <div class="stage-wrap">
         <div class="stage-toolbar">
           <div class="footer-note">
-            ☁️🩸 Clique un cadeau → clique une case pour l’ajouter. <span class="kbd">Double-clic</span> pour supprimer.
+            ☁️🩸 Clique un cadeau → clique une case • <span class="kbd">Double-clic</span> pour supprimer
           </div>
         </div>
 
@@ -506,12 +509,19 @@
       rows: 3,
       blur: 16,
       round: 22,
-      cellMin: 110,
-      cellMax: '1fr',
-      gap: 26
+      gap: 26,
+
+      // background (for accurate faux blur alignment)
+      bgUrl: null,
+      bgNaturalW: 0,
+      bgNaturalH: 0
     };
 
+    // Elements
+    const stage = document.getElementById('stage');
     const bg = document.getElementById('bg');
+    const grid = document.getElementById('grid');
+
     const bgInput = document.getElementById('bgInput');
     const clearBgBtn = document.getElementById('clearBg');
 
@@ -521,8 +531,6 @@
     const deselectBtn = document.getElementById('deselect');
 
     const layout = document.getElementById('layout');
-    const grid = document.getElementById('grid');
-    const stage = document.getElementById('stage');
 
     const blurRange = document.getElementById('blur');
     const blurVal = document.getElementById('blurVal');
@@ -533,40 +541,15 @@
     const resetGridBtn = document.getElementById('resetGrid');
     const exportBtn = document.getElementById('exportPng');
 
+    // --------- Utilities
     function setCSSVars(){
       document.documentElement.style.setProperty('--cols', state.cols);
       document.documentElement.style.setProperty('--blur', state.blur + 'px');
       document.documentElement.style.setProperty('--r', state.round + 'px');
-      document.documentElement.style.setProperty('--cellMin', state.cellMin + 'px');
-      document.documentElement.style.setProperty('--cellMax', state.cellMax);
       document.documentElement.style.setProperty('--gap', state.gap + 'px');
 
       blurVal.textContent = state.blur;
       roundVal.textContent = state.round;
-    }
-
-    function tuneGridForLayout(c, r){
-      state.cellMin = 110;
-      state.cellMax = '1fr';
-      state.gap = 26;
-
-      if(c === 3 && r === 2){
-        state.cellMin = 36;
-        state.cellMax = '70px';
-        state.gap = 10;
-      }
-    }
-
-    function setLayout(value){
-      const [c, r] = value.split('x').map(Number);
-      state.cols = c;
-      state.rows = r;
-
-      tuneGridForLayout(c, r);
-
-      state.cells = new Array(c * r).fill(null);
-      renderGrid();
-      setCSSVars();
     }
 
     function setSelectedGift(gift){
@@ -577,8 +560,7 @@
         renderGrid();
         return;
       }
-      const url = `./${gift.file}`; // ✅ RACINE
-      state.selectedGiftUrl = url;
+      state.selectedGiftUrl = `./${gift.file}`; // RACINE
       state.selectedGiftName = gift.name;
       renderGiftPreview();
       renderGrid();
@@ -612,6 +594,108 @@
       giftThumb.appendChild(img);
     }
 
+    // --------- Layout sizing
+    function apply3x2Sizing(){
+      // calcule un cellSize qui “rentre bien” sans prendre toute l’image
+      // on utilise l’inset du grid (40px *2)
+      const inset = (window.innerWidth <= 980) ? 18 : 40;
+      const stageW = stage.clientWidth;
+      const stageH = stage.clientHeight;
+
+      const availW = Math.max(200, stageW - inset * 2);
+      const availH = Math.max(200, stageH - inset * 2);
+
+      // on veut que la grille reste "compacte" => gap dépend de la taille
+      // target cellSize basé sur la place dispo, mais on plafonne
+      let cell = Math.floor(Math.min(availW / 3, availH / 2));
+      cell = Math.min(cell, 210);  // pas énorme
+      cell = Math.max(cell, 120);  // pas minuscule
+
+      const gap = Math.floor(cell * 0.16); // harmonieux
+
+      document.documentElement.style.setProperty('--cellSize', cell + 'px');
+      state.gap = gap;
+      setCSSVars();
+    }
+
+    function setLayout(value){
+      const [c, r] = value.split('x').map(Number);
+      state.cols = c;
+      state.rows = r;
+
+      // grid class
+      grid.classList.toggle('is-3x2', (c === 3 && r === 2));
+
+      // gap default
+      state.gap = 26;
+
+      // reset cells
+      state.cells = new Array(c * r).fill(null);
+      setCSSVars();
+
+      // apply special sizing for 3x2
+      if(c === 3 && r === 2){
+        apply3x2Sizing();
+      }
+
+      renderGrid();
+      requestAnimationFrame(updateGlassAlignment);
+    }
+
+    // --------- Faux blur alignment
+    function computeCoverParams(){
+      // calcule le rendu "cover center" du background (pour aligner le flou)
+      if(!state.bgUrl || !state.bgNaturalW || !state.bgNaturalH){
+        return null;
+      }
+      const stageW = stage.clientWidth;
+      const stageH = stage.clientHeight;
+
+      const s = Math.max(stageW / state.bgNaturalW, stageH / state.bgNaturalH);
+      const drawnW = state.bgNaturalW * s;
+      const drawnH = state.bgNaturalH * s;
+
+      const offsetX = (stageW - drawnW) / 2;
+      const offsetY = (stageH - drawnH) / 2;
+
+      return { drawnW, drawnH, offsetX, offsetY };
+    }
+
+    function updateGlassAlignment(){
+      // met à jour le background-position/size de chaque .glass-bg
+      const params = computeCoverParams();
+      const cells = grid.querySelectorAll('.cell');
+
+      // si pas de background : on met un fallback neutre
+      if(!params){
+        cells.forEach(cell => {
+          const gb = cell.querySelector('.glass-bg');
+          if(!gb) return;
+          gb.style.backgroundImage = '';
+          gb.style.background = 'linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.04))';
+        });
+        return;
+      }
+
+      const stageRect = stage.getBoundingClientRect();
+
+      cells.forEach(cell => {
+        const gb = cell.querySelector('.glass-bg');
+        if(!gb) return;
+
+        const rect = cell.getBoundingClientRect();
+        const left = rect.left - stageRect.left;
+        const top  = rect.top  - stageRect.top;
+
+        gb.style.background = 'none';
+        gb.style.backgroundImage = `url("${state.bgUrl}")`;
+        gb.style.backgroundSize = `${params.drawnW}px ${params.drawnH}px`;
+        // position du bg dans la case (aligné comme le background global)
+        gb.style.backgroundPosition = `${params.offsetX - left}px ${params.offsetY - top}px`;
+      });
+    }
+
+    // --------- Grid render
     function renderGrid(){
       grid.innerHTML = '';
       const total = state.cols * state.rows;
@@ -619,6 +703,24 @@
       for(let i=0; i<total; i++){
         const cell = document.createElement('div');
         cell.className = 'cell';
+
+        // glass layers (always present to ensure export matches)
+        const glassBg = document.createElement('div');
+        glassBg.className = 'glass-bg';
+
+        const glassTint = document.createElement('div');
+        glassTint.className = 'glass-tint';
+
+        const glassShine = document.createElement('div');
+        glassShine.className = 'glass-shine';
+
+        const glassEdge = document.createElement('div');
+        glassEdge.className = 'glass-edge';
+
+        cell.appendChild(glassBg);
+        cell.appendChild(glassTint);
+        cell.appendChild(glassShine);
+        cell.appendChild(glassEdge);
 
         const url = state.cells[i];
 
@@ -643,29 +745,63 @@
           if(!state.selectedGiftUrl) return;
           state.cells[i] = state.selectedGiftUrl;
           renderGrid();
+          requestAnimationFrame(updateGlassAlignment);
         });
 
         cell.addEventListener('dblclick', () => {
           state.cells[i] = null;
           renderGrid();
+          requestAnimationFrame(updateGlassAlignment);
         });
 
         grid.appendChild(cell);
       }
+
+      // align after DOM ready
+      requestAnimationFrame(updateGlassAlignment);
+    }
+
+    // --------- Background upload
+    async function setBackgroundFromUrl(url){
+      state.bgUrl = url;
+
+      // load natural size for correct cover calc
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => {
+        state.bgNaturalW = img.naturalWidth;
+        state.bgNaturalH = img.naturalHeight;
+
+        bg.style.backgroundImage = `url("${url}")`;
+        requestAnimationFrame(updateGlassAlignment);
+      };
+      img.onerror = () => {
+        // even if we can't read natural size, still set bg
+        bg.style.backgroundImage = `url("${url}")`;
+        state.bgNaturalW = 0;
+        state.bgNaturalH = 0;
+        requestAnimationFrame(updateGlassAlignment);
+      };
+      img.src = url;
     }
 
     bgInput.addEventListener('change', (e) => {
       const file = e.target.files?.[0];
       if(!file) return;
       const url = URL.createObjectURL(file);
-      bg.style.backgroundImage = `url("${url}")`;
+      setBackgroundFromUrl(url);
     });
 
     clearBgBtn.addEventListener('click', () => {
       bg.style.backgroundImage = '';
       bgInput.value = '';
+      state.bgUrl = null;
+      state.bgNaturalW = 0;
+      state.bgNaturalH = 0;
+      requestAnimationFrame(updateGlassAlignment);
     });
 
+    // --------- Gift selection
     giftSelect.addEventListener('change', () => {
       const v = giftSelect.value;
       if(v === ''){
@@ -681,11 +817,13 @@
       setSelectedGift(null);
     });
 
+    // --------- Controls
     layout.addEventListener('change', (e) => setLayout(e.target.value));
 
     blurRange.addEventListener('input', (e) => {
       state.blur = Number(e.target.value);
       setCSSVars();
+      requestAnimationFrame(updateGlassAlignment);
     });
 
     roundRange.addEventListener('input', (e) => {
@@ -698,15 +836,27 @@
       renderGrid();
     });
 
+    // resize: keep faux blur aligned + 3x2 sizing responsive
+    window.addEventListener('resize', () => {
+      if(state.cols === 3 && state.rows === 2){
+        apply3x2Sizing();
+      }
+      requestAnimationFrame(updateGlassAlignment);
+    });
+
+    // --------- Export PNG (now stable)
     exportBtn.addEventListener('click', async () => {
       try{
         exportBtn.disabled = true;
         exportBtn.textContent = "⏳ Export en cours...";
 
+        // ensure alignment is up-to-date
+        updateGlassAlignment();
+
         const canvas = await html2canvas(stage, {
           backgroundColor: null,
           useCORS: true,
-          scale: 2,
+          scale: 2
         });
 
         const dataUrl = canvas.toDataURL('image/png');
@@ -717,7 +867,7 @@
         a.click();
         a.remove();
       } catch(err){
-        alert("Export impossible (vérifie que les fichiers PNG sont bien accessibles sur GitHub Pages).");
+        alert("Export impossible (vérifie que GitHub Pages sert bien les images).");
         console.error(err);
       } finally {
         exportBtn.disabled = false;
@@ -725,7 +875,7 @@
       }
     });
 
-    // Init
+    // --------- Init
     renderGiftSelect();
     setLayout(layout.value);
 
@@ -735,9 +885,10 @@
 
     renderGiftPreview();
     renderGrid();
+
+    // Optionnel : si tu veux une image par défaut depuis la racine :
+    // setBackgroundFromUrl("./tonfond.png");
   </script>
 </body>
-</html>
-
 </html>
 
