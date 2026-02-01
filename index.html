@@ -187,6 +187,22 @@
       box-shadow: 0 0 0 3px rgba(255,60,90,.08);
     }
 
+    /* ✅ Mode "menu cadeau plus visible" (toggle) */
+    body.high-contrast-select select{
+      background: rgba(0,0,0,.55);
+      border-color: rgba(255,60,90,.65);
+      box-shadow:
+        0 0 0 3px rgba(255,60,90,.20),
+        0 10px 24px rgba(0,0,0,.35);
+      font-weight: 900;
+    }
+    body.high-contrast-select select:focus{
+      outline: none;
+      box-shadow:
+        0 0 0 4px rgba(255,60,90,.28),
+        0 12px 30px rgba(0,0,0,.45);
+    }
+
     .hint{
       font-size: 12px;
       color: rgba(255,255,255,.72);
@@ -410,6 +426,14 @@
         <label>🎁 2) Choisir un cadeau</label>
         <select id="giftSelect"></select>
 
+        <!-- ✅ Toggle visibilité du menu cadeau -->
+        <div class="row" style="margin-top:10px;">
+          <label style="display:flex;align-items:center;gap:10px;margin:0;color:rgba(255,255,255,.82);">
+            <input type="checkbox" id="visibleGiftMenu" />
+            🔆 Menu cadeau plus visible
+          </label>
+        </div>
+
         <div class="giftPreview">
           <div class="thumb" id="giftThumb"></div>
           <div class="meta">
@@ -490,187 +514,187 @@
      * ✅ Tes fichiers en RACINE (même niveau que index.html)
      */
     const GIFTS = [
-  { name: "9 queues 🪙 900", file: "9 queues.png" },
-  { name: "2026 🪙 1", file: "2026.png" },
-  { name: "je t'adore 🪙 1", file: "adore.png" },
-  { name: "Aile de papillon 🪙 399", file: "Aile de papillon.png" },
-  { name: "ailes fée 🪙 1", file: "ailesfee.png" },
-  { name: "Boîtes de largage 🪙 999 ", file: "Air drop.png" },
-  { name: "Ami Fruités 🪙 299", file: "Ami Fruités.png" },
-  { name: "amour langue signe 🪙 49", file: "amourlanguesigne.png" },
-  { name: "Animaux en scène 🪙 2500", file: "Animal Band.png" },
-  { name: "Arbre à diamants 🪙 1088", file: "Arbre à diamants.png" },
-  { name: "arc amour 🪙 99", file: "arcamour.png" },
-  { name: "arc en ciel 🪙 1", file: "arcenciel.png" },
-  { name: "bagel 🪙 35", file: "bagel.png" },
-  { name: "Singe Encourageant 🪙 349", file: "baking monkey.png" },
-  { name: "Plongée Baleine 🪙 2150", file: "Baleine.png" },
-  { name: "ballon coeur 🪙 150", file: "ballonamour.png" },
-  { name: "Stand des Amoureux 🪙 2199", file: "Bar à citron.png" },
-  { name: "basketball 🪙 1", file: "basketball.png" },
-  { name: "Batterie 🪙 1000", file: "Batterie.png" },
-  { name: "Ours Surfeur 🪙 800", file: "Bear Blind Box.Png" },
-  { name: "Devenir un Chaton 🪙 349", file: "Become Kitten.png" },
-  { name: "Benny Bébé Rhino 🪙 4999", file: "Berry.png" },
-  { name: "Bisous Loutre 🪙 399", file: "Bisous Loutre.png" },
-  { name: "bisous 🪙 1", file: "bisous.png" },
-  { name: "bubblegum 🪙 99", file: "bubblegum.png" },
-  { name: "calin de teddy 🪙 399", file: "calin de teddy.png" },
-  { name: "Camion de glace 🪙 2988", file: "Camion de glace.png" },
-  { name: "Capybara 🪙 30", file: "capybara.png" },
-  { name: "Carrousel 🪙 1999", file: "Carrousel.png" },
-  { name: "Carte de Voeux 🪙 1500", file: "carte de voeux.png" },
-  { name: "Casquette 🪙 99", file: "casquette.png" },
-  { name: "Chaise Gaming", file: "Chaise Gaming.png" },
-  { name: "chapeau moustache 🪙 99", file: "chapeaumoustache.png" },
-  { name: "Génial 🪙 1", file: "chaton.png" },
-  { name: "Chaos de la Chenille 🪙 149", file: "chenilledodo.png" },
-  { name: "Compagnon Citronnée 🪙 199", file: "citronnade.png" },
-  { name: "Clavier Gaming 🪙 4000", file: "Clavier gamer.png" },
-  { name: "Cochon Amoureux 🪙 10", file: "cochonamoureux.Png" },
+      { name: "9 queues 🪙 1800", file: "9 queues.png" },
+      { name: "2026 🪙 1", file: "2026.png" },
+      { name: "je t'adore 🪙 1", file: "adore.png" },
+      { name: "Aile de papillon 🪙 399", file: "Aile de papillon.png" },
+      { name: "ailes fée 🪙 1", file: "ailesfee.png" },
+      { name: "Boîtes de largage 🪙 999 ", file: "Air drop.png" },
+      { name: "Ami Fruités 🪙 299", file: "Ami Fruités.png" },
+      { name: "amour langue signe 🪙 49", file: "amourlanguesigne.png" },
+      { name: "Animaux en scène 🪙 2500", file: "Animal Band.png" },
+      { name: "Arbre à diamants 🪙 1088", file: "Arbre à diamants.png" },
+      { name: "arc amour 🪙 99", file: "arcamour.png" },
+      { name: "arc en ciel 🪙 1", file: "arcenciel.png" },
+      { name: "bagel 🪙 35", file: "bagel.png" },
+      { name: "Singe Encourageant 🪙 349", file: "baking monkey.png" },
+      { name: "Plongée Baleine 🪙 2150", file: "Baleine.png" },
+      { name: "ballon coeur 🪙 150", file: "ballonamour.png" },
+      { name: "Stand des Amoureux 🪙 2199", file: "Bar à citron.png" },
+      { name: "basketball 🪙 1", file: "basketball.png" },
+      { name: "Batterie 🪙 1000", file: "Batterie.png" },
+      { name: "Ours Surfeur 🪙 800", file: "Bear Blind Box.Png" },
+      { name: "Devenir un Chaton 🪙 349", file: "Become Kitten.png" },
+      { name: "Benny Bébé Rhino 🪙 4999", file: "Berry.png" },
+      { name: "Bisous Loutre 🪙 399", file: "Bisous Loutre.png" },
+      { name: "bisous 🪙 1", file: "bisous.png" },
+      { name: "bubblegum 🪙 99", file: "bubblegum.png" },
+      { name: "calin de teddy 🪙 399", file: "calin de teddy.png" },
+      { name: "Camion de glace 🪙 2988", file: "Camion de glace.png" },
+      { name: "Capybara 🪙 30", file: "capybara.png" },
+      { name: "Carrousel 🪙 1999", file: "Carrousel.png" },
+      { name: "Carte de Voeux 🪙 1500", file: "carte de voeux.png" },
+      { name: "Casquette 🪙 99", file: "casquette.png" },
+      { name: "Chaise Gaming 🪙 1200", file: "Chaise Gaming.png" },
+      { name: "chapeau moustache 🪙 99", file: "chapeaumoustache.png" },
+      { name: "Génial 🪙 1", file: "chaton.png" },
+      { name: "Chaos de la Chenille 🪙 149", file: "chenilledodo.png" },
+      { name: "Compagnon Citronnée 🪙 199", file: "citronnade.png" },
+      { name: "Clavier Gaming 🪙 4000", file: "Clavier gamer.png" },
+      { name: "Cochon Amoureux 🪙 10", file: "cochonamoureux.Png" },
 
-  { name: "Coeur 🪙 199", file: "Coeur bisous.png" },
-  { name: "Coeur Unis 🪙 299", file: "Coeur Uni.png" },
-  { name: "Coeur avec les mains 🪙 100", file: "coeuraveclesmains.png" },
-  { name: "Coeur dans les mains 🪙 100", file: "Coeurdanslesmains.png" },
-  { name: "coeur doigt 🪙 5", file: "coeurdoigt.png" },
-  { name: "coeur du jour 🪙 1", file: "coeurdujour.png" },
-  { name: "coeur en flammes 🪙 1", file: "coeureenflammes.png" },
-  { name: "coeur nuage 🪙 1", file: "coeurnuage.png" },
+      { name: "Coeur 🪙 199", file: "Coeur bisous.png" },
+      { name: "Coeur Unis 🪙 299", file: "Coeur Uni.png" },
+      { name: "Coeur avec les mains 🪙 100", file: "coeuraveclesmains.png" },
+      { name: "Coeur dans les mains 🪙 100", file: "Coeurdanslesmains.png" },
+      { name: "coeur doigt 🪙 5", file: "coeurdoigt.png" },
+      { name: "coeur du jour 🪙 1", file: "coeurdujour.png" },
+      { name: "coeur en flammes 🪙 1", file: "coeureenflammes.png" },
+      { name: "coeur nuage 🪙 1", file: "coeurnuage.png" },
 
-  { name: "Collier amitié 🪙 10", file: "collierami.png" },
-  { name: "Saxophone de Rosie 🪙 399 ", file: "Concert de Rosie.png" },
-  { name: "Confettis 🪙 100", file: "confetti.png" },
-  { name: "Cool 🪙 1", file: "Cool.png" },
-  { name: "Cooper rentre en.. 🪙 1999", file: "Cooper.png" },
-  { name: "Coquillage 🪙 100", file: "coquillage.png" },
-  { name: "Corail 🪙", file: "corail.png" },
-  { name: "Corgi 🪙 299", file: "corgi.png" },
-  { name: "Cote à Côte 🪙 199", file: "Coteacote.png" },
-  { name: "Couple puissant 🪙 2000", file: "Couple puissant.png" },
-  { name: "Couronnes Dragon 🪙 500", file: "Couronnes Dragon.png" },
-  { name: "Couronne TikTok 🪙 299", file: "couronnes TikTok.png" },
-  { name: "Crabe acclamant 🪙 199", file: "crabe.png" },
-  { name: "Crinière Lion 🪙 500", file: "Crinière lion.png" },
-  { name: "Cygne 🪙 699", file: "cygne.png" },
-  { name: "Ours Rythmique 🪙 2999", file: "Dancing Bear.png" },
-  { name: "Fusil à Diamant 🪙 5000", file: "Diamond gun.png" },
-  { name: "Casquette Dino 🪙 200", file: "dinocap.png" },
-  { name: "Lunettes de DJ 🪙 500", file: "Dj glasses.Png" },
-  { name: "Donut 🪙 30", file: "donuts.png" },
-  { name: "Drift en voiture 🪙 3000", file: "Drift.png" },
-  { name: "eclair 🪙 1", file: "eclair.png" },
-  { name: "Elise l'éléphante 🪙 5000", file: "Elise l'éléphant.Png" },
-  { name: "Empreinte de Dino 🪙 1", file: "empreintedino.png" },
-  { name: "etoile étincelante 🪙 199", file: "etoileetincelante.png" },
-  { name: "Famille 🪙 90", file: "famille.png" },
-  { name: "Feu d'artifice 🪙 1088", file: "Feu d'artifice.png" },
-  { name: "Puissance Max 🪙399", file: "Fire up.png" },
-  { name: "Poing contre Poing 🪙 90", file: "fistbump.png" },
+      { name: "Collier amitié 🪙 10", file: "collierami.png" },
+      { name: "Saxophone de Rosie 🪙 399 ", file: "Concert de Rosie.png" },
+      { name: "Confettis 🪙 100", file: "confetti.png" },
+      { name: "Cool 🪙 1", file: "Cool.png" },
+      { name: "Cooper rentre en.. 🪙 1999", file: "Cooper.png" },
+      { name: "Coquillage 🪙 100", file: "coquillage.png" },
+      { name: "Corail 🪙 499", file: "corail.png" },
+      { name: "Corgi 🪙 299", file: "corgi.png" },
+      { name: "Cote à Côte 🪙 199", file: "Coteacote.png" },
+      { name: "Couple puissant 🪙 2000", file: "Couple puissant.png" },
+      { name: "Couronnes Dragon 🪙 500", file: "Couronnes Dragon.png" },
+      { name: "Couronne TikTok 🪙 299", file: "couronnes TikTok.png" },
+      { name: "Crabe acclamant 🪙 199", file: "crabe.png" },
+      { name: "Crinière Lion 🪙 500", file: "Crinière lion.png" },
+      { name: "Cygne 🪙 699", file: "cygne.png" },
+      { name: "Ours Rythmique 🪙 2999", file: "Dancing Bear.png" },
+      { name: "Fusil à Diamant 🪙 5000", file: "Diamond gun.png" },
+      { name: "Casquette Dino 🪙 200", file: "dinocap.png" },
+      { name: "Lunettes de DJ 🪙 500", file: "Dj glasses.Png" },
+      { name: "Donut 🪙 30", file: "donuts.png" },
+      { name: "Drift en voiture 🪙 3000", file: "Drift.png" },
+      { name: "eclair 🪙 1", file: "eclair.png" },
+      { name: "Elise l'éléphante 🪙 5000", file: "Elise l'éléphant.Png" },
+      { name: "Empreinte de Dino 🪙 1", file: "empreintedino.png" },
+      { name: "etoile étincelante 🪙 199", file: "etoileetincelante.png" },
+      { name: "Famille 🪙 90", file: "famille.png" },
+      { name: "Feu d'artifice 🪙 1088", file: "Feu d'artifice.png" },
+      { name: "Puissance Max 🪙399", file: "Fire up.png" },
+      { name: "Poing contre Poing 🪙 90", file: "fistbump.png" },
 
-  { name: " Bouée Flamant Rose 🪙999", file: "flamant rose.Png" },
-  { name: "fleur S 🪙 20", file: "fleurenS.png" },
-  { name: "Rencontre du Futur 🪙 1500", file: "Futur.png" },
-  { name: "Galaxie 🪙 1000", file: "Galaxie.png" },
-  { name: "Ours Gameur 🪙 4088", file: "Gaming Bear.png" },
-  { name: "Gant de Boxe 🪙 299", file: "gantdeboxe.png" },
-  { name: "Gant Dorée 🪙 10", file: "gantdorée.png" },
-  { name: "Part de Gateau D'anniversaire 🪙 1", file: "gateauanniv.png" },
-  { name: "Part de Gateau 🪙 1", file: "gateaupart.png" },
-  { name: "gg 🪙 1", file: "gg.png" },
-  { name: "Girafe 🪙 1000", file: "Girafe.Png" },
-  { name: "Glace 🪙 5", file: "glace.png" },
-  { name: "Bâton brillant 🪙 1", file: "glow.png" },
-  { name: "Grande Rose 🪙 500", file: "Grande Roses.png" },
-  { name: "Grue 🪙 100", file: "grue.png" },
-  { name: "Parôle d'amour 🪙 1", file: "heartlytalyk.png" },
-  { name: "ice-cream 🪙 1", file: "ice-cream.png" },
-  { name: "Jet volant 🪙 5000 ", file: "Jet volant.png" },
-  { name: "Je T'aime 🪙 199", file: "jetaime.png" },
-  { name: "Pass Aventure 🪙 10", file: "journepass.png" },
-  { name: "Sourire Juteux 🪙 199", file: "juicysmile.png" },
-  { name: "Eau De Coco 🪙 199", file: "jusdecoco.png" },
-  { name: "Leon le chaton 🪙 4888", file: "Leon le chaton.png" },
-  { name: "Loup d'arabie 🪙 5500", file: "Loup D'arabie.png" },
-  { name: "Peinture D'amour 🪙 99", file: "lovepainting.png" },
-  { name: "Lunettes de Soleil 🪙 199", file: "lunettesdesoleil.png" },
-  { name: "Magie du Café 🪙 199 ", file: "magieducafe.png" },
-  { name: "Mama Mia 🪙 1", file: "mamamia.png" },
-  { name: "Manettes 🪙 100", file: "Manettes.png" },
-  { name: "Manifestation XXL 🪙 1500", file: "Manifestation XXL.png" },
-  { name: "Amour Astronaute 🪙 349", file: "Marked With love.png" },
-  { name: "Marque D'amour 🪙 99", file: "marquedamour.png" },
-  { name: "Masque Pharaon 🪙 399", file: "masque pharaon.png" },
-  { name: "masque", file: "masque.png" },
-  { name: "Un grand Bravo 🪙 149", file: "megaphone.png" },
-  { name: "Pistolet Billets 🪙 500", file: "Money Gun.png" },
-  { name: "Magnettes d'argent 🪙 549", file: "Money Magnet.png" },
-  { name: "Mongolfiere 🪙 1000", file: "Mongolfiere.Png" },
+      { name: " Bouée Flamant Rose 🪙999", file: "flamant rose.Png" },
+      { name: "fleur S 🪙 20", file: "fleurenS.png" },
+      { name: "Rencontre du Futur 🪙 1500", file: "Futur.png" },
+      { name: "Galaxie 🪙 1000", file: "Galaxie.png" },
+      { name: "Ours Gameur 🪙 4088", file: "Gaming Bear.png" },
+      { name: "Gant de Boxe 🪙 299", file: "gantdeboxe.png" },
+      { name: "Gant Dorée 🪙 10", file: "gantdorée.png" },
+      { name: "Part de Gateau D'anniversaire 🪙 1", file: "gateauanniv.png" },
+      { name: "Part de Gateau 🪙 1", file: "gateaupart.png" },
+      { name: "gg 🪙 1", file: "gg.png" },
+      { name: "Girafe 🪙 1000", file: "Girafe.Png" },
+      { name: "Glace 🪙 5", file: "glace.png" },
+      { name: "Bâton brillant 🪙 1", file: "glow.png" },
+      { name: "Grande Rose 🪙 500", file: "Grande Roses.png" },
+      { name: "Grue 🪙 100", file: "grue.png" },
+      { name: "Parôle d'amour 🪙 1", file: "heartlytalyk.png" },
+      { name: "ice-cream 🪙 1", file: "ice-cream.png" },
+      { name: "Jet volant 🪙 5000 ", file: "Jet volant.png" },
+      { name: "Je T'aime 🪙 199", file: "jetaime.png" },
+      { name: "Pass Aventure 🪙 10", file: "journepass.png" },
+      { name: "Sourire Juteux 🪙 199", file: "juicysmile.png" },
+      { name: "Eau De Coco 🪙 199", file: "jusdecoco.png" },
+      { name: "Leon le chaton 🪙 4888", file: "Leon le chaton.png" },
+      { name: "Loup d'arabie 🪙 5500", file: "Loup D'arabie.png" },
+      { name: "Peinture D'amour 🪙 99", file: "lovepainting.png" },
+      { name: "Lunettes de Soleil 🪙 199", file: "lunettesdesoleil.png" },
+      { name: "Magie du Café 🪙 199 ", file: "magieducafe.png" },
+      { name: "Mama Mia 🪙 1", file: "mamamia.png" },
+      { name: "Manettes 🪙 100", file: "Manettes.png" },
+      { name: "Manifestation XXL 🪙 1500", file: "Manifestation XXL.png" },
+      { name: "Amour Astronaute 🪙 349", file: "Marked With love.png" },
+      { name: "Marque D'amour 🪙 99", file: "marquedamour.png" },
+      { name: "Masque Pharaon 🪙 399", file: "masque pharaon.png" },
+      { name: "masque 🪙 149", file: "masque.png" },
+      { name: "Un grand Bravo 🪙 149", file: "megaphone.png" },
+      { name: "Pistolet Billets 🪙 500", file: "Money Gun.png" },
+      { name: "Magnettes d'argent 🪙 549", file: "Money Magnet.png" },
+      { name: "Mongolfiere 🪙 1000", file: "Mongolfiere.Png" },
 
-  { name: "Fleur clair de Lune 🪙 1400", file: "Moonlight Flower.png" },
-  { name: "Moto 🪙 2988", file: "Moto.png" },
-  { name: "noeud papillon", file: "noeudpapillon.png" },
-  { name: "Oie Détendu 🪙 399", file: "Oie détendu.png" },
-  { name: "Bisous Joyeux 🪙 199", file: "oiseau.png" },
-  { name: "Ours Dansant 🪙 3000", file: "ours rythmic.png" },
-  { name: "Ours de Rose 🪙 214", file: "oursderose.png" },
-  { name: "Ourson 🪙 100", file: "ourson.png" },
-  { name: "Panda Climb 🪙 199", file: "pandaclimb.png" },
-  { name: "Papillon 🪙 88", file: "Papillon.png" },
-  { name: "Parfum 🪙 20", file: "parfum.png" },
-  { name: "Bus Festif 🪙 2999", file: "Party Bus.png" },
-  { name: "Patate qui flotte 🪙 1500", file: "Patate qui flottre.png" },
-  { name: "Pêche 🪙 5", file: "peche.png" },
-  { name: "Petite couronne 🪙 99", file: "petitecouronne.png" },
-  { name: "Pingouin qui surf 🪙 249", file: "pingouinsurf.png" },
-  { name: "Pluie de météores 🪙 3000", file: "Pluie de météore.png" },
-  { name: "Pneu 🪙 1", file: "pneu.png" },
-  { name: "Polaris 🪙 500", file: "Polaris.png" },
-  { name: "Popcorn 🪙 149", file: "popcorn.png" },
-  { name: "Populaire 🪙 1", file: "populaire.png" },
-  { name: "Positivité 🪙 199", file: "positivité.png" },
-  { name: "Pouce vers le haut 🪙 2", file: "pouceverslehaut.png" },
-  { name: "Poulet espiègles 🪙 299", file: "Poulet espiègles.png" },
-  { name: "Poulpe 🪙 199", file: "poulpe.png" },
-  { name: "Poursuit tes rêves 🪙 1500", file: "Poursuit tes reves.png" },
-  { name: "Prince 🪙 500", file: "Prince.png" },
-  { name: "Jet Privé 🪙 4888", file: "Private Jet.png" },
-  { name: "Bisous Chiot 🪙 299", file: "Puppy kiss.png" },
-  { name: "Refuge de l'amour 🪙 1200", file: "Refude de l'amour.png" },
-  { name: "Rocky Rockeur 🪙 399", file: "Rocky.png" },
-  { name: "Rosa 🪙 10", file: "rosa.png" },
-  { name: "Rose à jamais 🪙 399", file: "Rose à jamais.png" },
-  { name: "Rose à Main 🪙 199", file: "Rose pour toi.png" },
-  { name: "rose 🪙 1", file: "rose.png" },
-  { name: "rose blanche 🪙 1", file: "roseblanche.png" },
-  { name: "Sage Futé 🪙 399", file: "sage intelligent.png" },
-  { name: "slay 🪙 1", file: "slay.png" },
-  { name: "Sous contrôles 🪙 1500", file: "Sous contrôles.Png" },
+      { name: "Fleur clair de Lune 🪙 1400", file: "Moonlight Flower.png" },
+      { name: "Moto 🪙 2988", file: "Moto.png" },
+      { name: "noeud papillon 🪙 149", file: "noeudpapillon.png" },
+      { name: "Oie Détendu 🪙 399", file: "Oie détendu.png" },
+      { name: "Bisous Joyeux 🪙 199", file: "oiseau.png" },
+      { name: "Ours Dansant 🪙 3000", file: "ours rythmic.png" },
+      { name: "Ours de Rose 🪙 214", file: "oursderose.png" },
+      { name: "Ourson 🪙 100", file: "ourson.png" },
+      { name: "Panda Climb 🪙 199", file: "pandaclimb.png" },
+      { name: "Papillon 🪙 88", file: "Papillon.png" },
+      { name: "Parfum 🪙 20", file: "parfum.png" },
+      { name: "Bus Festif 🪙 2999", file: "Party Bus.png" },
+      { name: "Patate qui flotte 🪙 1500", file: "Patate qui flottre.png" },
+      { name: "Pêche 🪙 5", file: "peche.png" },
+      { name: "Petite couronne 🪙 99", file: "petitecouronne.png" },
+      { name: "Pingouin qui surf 🪙 249", file: "pingouinsurf.png" },
+      { name: "Pluie de météores 🪙 3000", file: "Pluie de météore.png" },
+      { name: "Pneu 🪙 1", file: "pneu.png" },
+      { name: "Polaris 🪙 500", file: "Polaris.png" },
+      { name: "Popcorn 🪙 149", file: "popcorn.png" },
+      { name: "Populaire 🪙 1", file: "populaire.png" },
+      { name: "Positivité 🪙 199", file: "positivité.png" },
+      { name: "Pouce vers le haut 🪙 2", file: "pouceverslehaut.png" },
+      { name: "Poulet espiègles 🪙 299", file: "Poulet espiègles.png" },
+      { name: "Poulpe 🪙 199", file: "poulpe.png" },
+      { name: "Poursuit tes rêves 🪙 1500", file: "Poursuit tes reves.png" },
+      { name: "Prince 🪙 500", file: "Prince.png" },
+      { name: "Jet Privé 🪙 4888", file: "Private Jet.png" },
+      { name: "Bisous Chiot 🪙 299", file: "Puppy kiss.png" },
+      { name: "Refuge de l'amour 🪙 1200", file: "Refude de l'amour.png" },
+      { name: "Rocky Rockeur 🪙 399", file: "Rocky.png" },
+      { name: "Rosa 🪙 10", file: "rosa.png" },
+      { name: "Rose à jamais 🪙 399", file: "Rose à jamais.png" },
+      { name: "Rose à Main 🪙 199", file: "Rose pour toi.png" },
+      { name: "rose 🪙 1", file: "rose.png" },
+      { name: "rose blanche 🪙 1", file: "roseblanche.png" },
+      { name: "Sage Futé 🪙 399", file: "sage intelligent.png" },
+      { name: "slay 🪙 1", file: "slay.png" },
+      { name: "Sous contrôles 🪙 1500", file: "Sous contrôles.Png" },
 
-  { name: "Chat de L'espace 🪙 1500", file: "Space Cat.png" },
-  { name: "Chien de L'espace 🪙 2500", file: "Space dog.png" },
-  { name: "Steven Wingman 🪙 1", file: "steven.png" },
-  { name: "Super GG 🪙 100", file: "supergg.png" },
-  { name: "Super Populaire 🪙 9", file: "superpopulaire.png" },
-  { name: "Taureau 🪙 3000", file: "taureau.Png" },
-  { name: "Tcheck 🪙 299", file: "tcheck.png" },
-  { name: "tiktok 🪙 1", file: "tiktok.png" },
-  { name: "Tofu 🪙 5", file: "tofu.png" },
-  { name: "Tom la Tomate 🪙 1", file: "tomtomate.png" },
-  { name: "Ton concert 🪙 4500", file: "ton concert.png" },
-  { name: "Train 🪙 899", file: "Train.png" },
-  { name: "transfo patate 🪙 150", file: "transfopatate.png" },
-  { name: "Trompe D'éléphant 🪙 299", file: "trompe d'éléphant.png" },
-  { name: "Trophée Basket 🪙 700", file: "Trophée Basket.png" },
-  { name: "umake me so happy 🪙 30", file: "umakemisohappy.png" },
-  { name: "Vaisseau de Level 🪙 1500", file: "Vaisseau de Level.png" },
-  { name: "Vaisseau spatial 🪙 4999", file: "Vaisseau spacial.png" },
-  { name: "Voyage avec toi 🪙 999", file: "Voyage avec toi.png" },
-  { name: "Mercredi Gagnant 🪙 99", file: "winningwednesday.png" },
-  { name: "FLeurs XXXL 🪙 500", file: "XXL flower.png" },
-  { name: "you are my jam 🪙 30", file: "youaremyjam.png" },
-  { name: "you are on a roll 🪙 30", file: "youaremyroll.png" }
-];
+      { name: "Chat de L'espace 🪙 1500", file: "Space Cat.png" },
+      { name: "Chien de L'espace 🪙 2500", file: "Space dog.png" },
+      { name: "Steven Wingman 🪙 1", file: "steven.png" },
+      { name: "Super GG 🪙 100", file: "supergg.png" },
+      { name: "Super Populaire 🪙 9", file: "superpopulaire.png" },
+      { name: "Taureau 🪙 3000", file: "taureau.Png" },
+      { name: "Tcheck 🪙 299", file: "tcheck.png" },
+      { name: "tiktok 🪙 1", file: "tiktok.png" },
+      { name: "Tofu 🪙 5", file: "tofu.png" },
+      { name: "Tom la Tomate 🪙 1", file: "tomtomate.png" },
+      { name: "Ton concert 🪙 4500", file: "ton concert.png" },
+      { name: "Train 🪙 899", file: "Train.png" },
+      { name: "transfo patate 🪙 150", file: "transfopatate.png" },
+      { name: "Trompe D'éléphant 🪙 299", file: "trompe d'éléphant.png" },
+      { name: "Trophée Basket 🪙 700", file: "Trophée Basket.png" },
+      { name: "umake me so happy 🪙 30", file: "umakemisohappy.png" },
+      { name: "Vaisseau de Level 🪙 1500", file: "Vaisseau de Level.png" },
+      { name: "Vaisseau spatial 🪙 4999", file: "Vaisseau spacial.png" },
+      { name: "Voyage avec toi 🪙 999", file: "Voyage avec toi.png" },
+      { name: "Mercredi Gagnant 🪙 99", file: "winningwednesday.png" },
+      { name: "FLeurs XXXL 🪙 500", file: "XXL flower.png" },
+      { name: "you are my jam 🪙 30", file: "youaremyjam.png" },
+      { name: "you are on a roll 🪙 30", file: "youaremyroll.png" }
+    ];
 
     const state = {
       selectedGiftUrl: null,
@@ -700,6 +724,8 @@
     const giftThumb = document.getElementById('giftThumb');
     const giftName = document.getElementById('giftName');
     const deselectBtn = document.getElementById('deselect');
+
+    const visibleGiftMenu = document.getElementById('visibleGiftMenu');
 
     const layout = document.getElementById('layout');
 
@@ -737,6 +763,23 @@
       renderGrid();
     }
 
+    function parseCoinsFromName(name){
+      // Exemples gérés :
+      // "Corail 🪙 499"
+      // "Puissance Max 🪙399"
+      // "Boîtes de largage 🪙 999 "
+      const m = name.match(/🪙\s*(\d+)/);
+      return m ? Number(m[1]) : Number.POSITIVE_INFINITY; // ceux sans 🪙 vont à la fin
+    }
+
+    function getSortedGiftIndexes(){
+      // On trie uniquement l'affichage du select, sans modifier l'ordre original du tableau
+      return GIFTS
+        .map((g, idx) => ({ idx, coins: parseCoinsFromName(g.name), name: g.name }))
+        .sort((a, b) => (a.coins - b.coins) || a.name.localeCompare(b.name, 'fr'))
+        .map(x => x.idx);
+    }
+
     function renderGiftSelect(){
       giftSelect.innerHTML = '';
       const opt0 = document.createElement('option');
@@ -744,9 +787,11 @@
       opt0.textContent = '— Aucun (désélectionné) —';
       giftSelect.appendChild(opt0);
 
-      GIFTS.forEach((g, idx) => {
+      const sortedIdx = getSortedGiftIndexes();
+      sortedIdx.forEach((idx) => {
+        const g = GIFTS[idx];
         const opt = document.createElement('option');
-        opt.value = String(idx);
+        opt.value = String(idx); // IMPORTANT : on garde l'index d'origine
         opt.textContent = `🎁 ${g.name}`;
         giftSelect.appendChild(opt);
       });
@@ -972,7 +1017,7 @@
       requestAnimationFrame(updateGlassAlignment);
     });
 
-    // --------- Gift selection
+    // --------- Gift selection (select trié par coins)
     giftSelect.addEventListener('change', () => {
       const v = giftSelect.value;
       if(v === ''){
@@ -986,6 +1031,11 @@
     deselectBtn.addEventListener('click', () => {
       giftSelect.value = '';
       setSelectedGift(null);
+    });
+
+    // --------- Toggle "menu plus visible"
+    visibleGiftMenu.addEventListener('change', () => {
+      document.body.classList.toggle('high-contrast-select', visibleGiftMenu.checked);
     });
 
     // --------- Controls
@@ -1047,7 +1097,7 @@
     });
 
     // --------- Init
-    renderGiftSelect();
+    renderGiftSelect();          // ✅ tri par coins
     setLayout(layout.value);
 
     state.blur = Number(blurRange.value);
@@ -1062,4 +1112,5 @@
   </script>
 </body>
 </html>
+
 
