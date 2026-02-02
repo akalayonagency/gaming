@@ -38,6 +38,10 @@
 
       /* special: 3x2 auto-fit */
       --cellSize: 160px;
+
+      /* label sizing */
+      --labelGap: 10px;
+      --labelMinH: 2.4em; /* ~2 lignes */
     }
 
     *{ box-sizing:border-box; }
@@ -316,7 +320,19 @@
       grid-template-columns: repeat(3, var(--cellSize));
     }
 
+    /* ✅ Chaque item = une "tuile" (case + label en dessous) */
+    .tile{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      gap: var(--labelGap);
+      user-select:none;
+    }
+
+    /* ✅ La case garde EXACTEMENT son style (physique inchangé) */
     .cell{
+      width: 100%;
       aspect-ratio: 1 / 1;
       border-radius: var(--r);
       position:relative;
@@ -398,6 +414,44 @@
       text-align:center;
       padding: 10px;
     }
+
+    /* ✅ Label sous chaque case (style “overlay” : blanc + contour noir) */
+    .cellLabel{
+      width: 100%;
+      text-align:center;
+      font-weight: 1000;
+      letter-spacing: .6px;
+      line-height: 1.05;
+      text-transform: uppercase;
+
+      /* look proche overlay */
+      font-size: 16px;
+      color: rgba(255,255,255,.96);
+      text-shadow:
+        0 4px 0 rgba(0,0,0,.60),
+        0 10px 18px rgba(0,0,0,.55);
+
+      -webkit-text-stroke: 3px rgba(0,0,0,.92);
+      paint-order: stroke fill;
+
+      /* 2 lignes max comme l'exemple */
+      min-height: var(--labelMinH);
+      display:flex;
+      align-items:flex-start;
+      justify-content:center;
+
+      /* coupe propre */
+      overflow:hidden;
+      padding: 0 6px;
+      word-break: break-word;
+    }
+
+    /* si label vide => on garde la place sans afficher */
+    .cellLabel.is-empty{
+      color: transparent;
+      -webkit-text-stroke: 0px transparent;
+      text-shadow: none;
+    }
   </style>
 </head>
 
@@ -476,7 +530,10 @@
           <input id="round" type="range" min="8" max="40" value="22" />
         </div>
 
-        <div class="hint">🩸 Choisis un cadeau → clique une case.</div>
+        <div class="hint">
+          🩸 Choisis un cadeau → clique une case.<br/>
+          ✍️ Pour écrire sous une case : <span class="kbd">clic droit</span> sur la case (ou <span class="kbd">Ctrl</span>+clic).
+        </div>
       </div>
 
       <div class="section">
@@ -496,7 +553,8 @@
       <div class="stage-wrap">
         <div class="stage-toolbar">
           <div class="footer-note">
-            ☁️🩸 Clique un cadeau → clique une case • <span class="kbd">Double-clic</span> pour supprimer
+            ☁️🩸 Cadeau : clique une case • <span class="kbd">Double-clic</span> pour supprimer •
+            ✍️ Texte : <span class="kbd">clic droit</span> (ou <span class="kbd">Ctrl</span>+clic)
           </div>
         </div>
 
@@ -544,7 +602,7 @@
       { name: "Capybara 🪙 30", file: "capybara.png" },
       { name: "Carrousel 🪙 1999", file: "Carrousel.png" },
       { name: "Carte de Voeux 🪙 1500", file: "carte de voeux.png" },
-      { name: "Casquette 🪙 99", file: "casquette.png" },
+      { name: "Casquette 🪙 99", file: "Casquette.png" },
       { name: "Chaise Gaming 🪙 1200", file: "Chaise Gaming.png" },
       { name: "chapeau moustache 🪙 99", file: "chapeaumoustache.png" },
       { name: "Génial 🪙 1", file: "chaton.png" },
@@ -699,7 +757,13 @@
     const state = {
       selectedGiftUrl: null,
       selectedGiftName: null,
+
+      // ✅ contenu des cases (image)
       cells: [],
+
+      // ✅ texte sous les cases
+      labels: [],
+
       cols: 5,
       rows: 3,
       blur: 16,
@@ -764,16 +828,11 @@
     }
 
     function parseCoinsFromName(name){
-      // Exemples gérés :
-      // "Corail 🪙 499"
-      // "Puissance Max 🪙399"
-      // "Boîtes de largage 🪙 999 "
       const m = name.match(/🪙\s*(\d+)/);
-      return m ? Number(m[1]) : Number.POSITIVE_INFINITY; // ceux sans 🪙 vont à la fin
+      return m ? Number(m[1]) : Number.POSITIVE_INFINITY;
     }
 
     function getSortedGiftIndexes(){
-      // On trie uniquement l'affichage du select, sans modifier l'ordre original du tableau
       return GIFTS
         .map((g, idx) => ({ idx, coins: parseCoinsFromName(g.name), name: g.name }))
         .sort((a, b) => (a.coins - b.coins) || a.name.localeCompare(b.name, 'fr'))
@@ -791,7 +850,7 @@
       sortedIdx.forEach((idx) => {
         const g = GIFTS[idx];
         const opt = document.createElement('option');
-        opt.value = String(idx); // IMPORTANT : on garde l'index d'origine
+        opt.value = String(idx);
         opt.textContent = `🎁 ${g.name}`;
         giftSelect.appendChild(opt);
       });
@@ -812,8 +871,6 @@
 
     // --------- Layout sizing
     function apply3x2Sizing(){
-      // calcule un cellSize qui “rentre bien” sans prendre toute l’image
-      // on utilise l’inset du grid (40px *2)
       const inset = (window.innerWidth <= 980) ? 18 : 40;
       const stageW = stage.clientWidth;
       const stageH = stage.clientHeight;
@@ -821,17 +878,34 @@
       const availW = Math.max(200, stageW - inset * 2);
       const availH = Math.max(200, stageH - inset * 2);
 
-      // on veut que la grille reste "compacte" => gap dépend de la taille
-      // target cellSize basé sur la place dispo, mais on plafonne
       let cell = Math.floor(Math.min(availW / 3, availH / 2));
-      cell = Math.min(cell, 210);  // pas énorme
-      cell = Math.max(cell, 120);  // pas minuscule
+      cell = Math.min(cell, 210);
+      cell = Math.max(cell, 120);
 
-      const gap = Math.floor(cell * 0.16); // harmonieux
+      const gap = Math.floor(cell * 0.16);
 
       document.documentElement.style.setProperty('--cellSize', cell + 'px');
       state.gap = gap;
       setCSSVars();
+    }
+
+    function ensureArraysSize(){
+      const total = state.cols * state.rows;
+
+      if(!Array.isArray(state.cells)) state.cells = [];
+      if(!Array.isArray(state.labels)) state.labels = [];
+
+      if(state.cells.length !== total){
+        const old = state.cells.slice();
+        state.cells = new Array(total).fill(null);
+        for(let i=0; i<Math.min(old.length, total); i++) state.cells[i] = old[i];
+      }
+
+      if(state.labels.length !== total){
+        const oldL = state.labels.slice();
+        state.labels = new Array(total).fill('');
+        for(let i=0; i<Math.min(oldL.length, total); i++) state.labels[i] = oldL[i] || '';
+      }
     }
 
     function setLayout(value){
@@ -839,17 +913,16 @@
       state.cols = c;
       state.rows = r;
 
-      // grid class
       grid.classList.toggle('is-3x2', (c === 3 && r === 2));
 
-      // gap default
       state.gap = 26;
 
-      // reset cells
+      // ✅ on conserve la logique mais on initialise aussi labels
       state.cells = new Array(c * r).fill(null);
+      state.labels = new Array(c * r).fill('');
+
       setCSSVars();
 
-      // apply special sizing for 3x2
       if(c === 3 && r === 2){
         apply3x2Sizing();
       }
@@ -860,7 +933,6 @@
 
     // --------- Faux blur alignment
     function computeCoverParams(){
-      // calcule le rendu "cover center" du background (pour aligner le flou)
       if(!state.bgUrl || !state.bgNaturalW || !state.bgNaturalH){
         return null;
       }
@@ -878,11 +950,9 @@
     }
 
     function updateGlassAlignment(){
-      // met à jour le background-position/size de chaque .glass-bg
       const params = computeCoverParams();
       const cells = grid.querySelectorAll('.cell');
 
-      // si pas de background : on met un fallback neutre
       if(!params){
         cells.forEach(cell => {
           const gb = cell.querySelector('.glass-bg');
@@ -906,21 +976,35 @@
         gb.style.background = 'none';
         gb.style.backgroundImage = `url("${state.bgUrl}")`;
         gb.style.backgroundSize = `${params.drawnW}px ${params.drawnH}px`;
-        // position du bg dans la case (aligné comme le background global)
         gb.style.backgroundPosition = `${params.offsetX - left}px ${params.offsetY - top}px`;
       });
     }
 
-    // --------- Grid render
+    // --------- Label helper
+    function editLabelAt(index){
+      const current = (state.labels[index] || '').toString();
+      const next = prompt("Texte sous la case (vide = supprimer) :", current);
+      if(next === null) return; // annuler
+      state.labels[index] = (next || '').trim();
+      renderGrid();
+      requestAnimationFrame(updateGlassAlignment);
+    }
+
+    // --------- Grid render (✅ case + label dessous)
     function renderGrid(){
+      ensureArraysSize();
       grid.innerHTML = '';
+
       const total = state.cols * state.rows;
 
       for(let i=0; i<total; i++){
+        const tile = document.createElement('div');
+        tile.className = 'tile';
+
         const cell = document.createElement('div');
         cell.className = 'cell';
 
-        // glass layers (always present to ensure export matches)
+        // glass layers
         const glassBg = document.createElement('div');
         glassBg.className = 'glass-bg';
 
@@ -957,7 +1041,14 @@
           cell.appendChild(empty);
         }
 
-        cell.addEventListener('click', () => {
+        // ✅ interactions existantes (inchangées)
+        cell.addEventListener('click', (e) => {
+          // Ctrl+clic (ou ⌘ Mac) => éditer le texte, sans placer de cadeau
+          if(e.ctrlKey || e.metaKey){
+            editLabelAt(i);
+            return;
+          }
+
           if(!state.selectedGiftUrl) return;
           state.cells[i] = state.selectedGiftUrl;
           renderGrid();
@@ -970,10 +1061,32 @@
           requestAnimationFrame(updateGlassAlignment);
         });
 
-        grid.appendChild(cell);
+        // ✅ clic droit = éditer le label (comme demandé)
+        cell.addEventListener('contextmenu', (e) => {
+          e.preventDefault();
+          editLabelAt(i);
+        });
+
+        // Label sous la case
+        const label = document.createElement('div');
+        label.className = 'cellLabel';
+        const txt = (state.labels[i] || '').trim();
+
+        if(!txt){
+          label.classList.add('is-empty');
+          label.textContent = '—';
+        } else {
+          label.textContent = txt;
+        }
+
+        // Option : double-clic sur le label = éditer (pratique)
+        label.addEventListener('dblclick', () => editLabelAt(i));
+
+        tile.appendChild(cell);
+        tile.appendChild(label);
+        grid.appendChild(tile);
       }
 
-      // align after DOM ready
       requestAnimationFrame(updateGlassAlignment);
     }
 
@@ -981,7 +1094,6 @@
     async function setBackgroundFromUrl(url){
       state.bgUrl = url;
 
-      // load natural size for correct cover calc
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.onload = () => {
@@ -992,7 +1104,6 @@
         requestAnimationFrame(updateGlassAlignment);
       };
       img.onerror = () => {
-        // even if we can't read natural size, still set bg
         bg.style.backgroundImage = `url("${url}")`;
         state.bgNaturalW = 0;
         state.bgNaturalH = 0;
@@ -1054,6 +1165,7 @@
 
     resetGridBtn.addEventListener('click', () => {
       state.cells = new Array(state.cols * state.rows).fill(null);
+      state.labels = new Array(state.cols * state.rows).fill('');
       renderGrid();
     });
 
@@ -1071,7 +1183,6 @@
         exportBtn.disabled = true;
         exportBtn.textContent = "⏳ Export en cours...";
 
-        // ensure alignment is up-to-date
         updateGlassAlignment();
 
         const canvas = await html2canvas(stage, {
@@ -1097,7 +1208,7 @@
     });
 
     // --------- Init
-    renderGiftSelect();          // ✅ tri par coins
+    renderGiftSelect();
     setLayout(layout.value);
 
     state.blur = Number(blurRange.value);
@@ -1106,11 +1217,7 @@
 
     renderGiftPreview();
     renderGrid();
-
-    // Optionnel : si tu veux une image par défaut depuis la racine :
-    // setBackgroundFromUrl("./tonfond.png");
   </script>
 </body>
 </html>
-
 
