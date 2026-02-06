@@ -29,15 +29,12 @@
 
       /* grid vars */
       --cols: 5;
+      --rows: 3;
       --blur: 16px;
       --gap: 26px;
 
-      /* default sizing for most layouts */
-      --cellMin: 110px;
-      --cellMax: 1fr;
-
-      /* special: 3x2 auto-fit */
-      --cellSize: 160px;
+      /* ✅ taille calculée (TOUTES dispositions) */
+      --cellSize: 150px;
 
       /* label sizing */
       --labelGap: 10px;
@@ -282,7 +279,7 @@
     /* ✅ STAGE = rectangle parfait */
     .stage{
       position:relative;
-      border-radius: 0px; /* ✅ plus arrondi */
+      border-radius: 0px;
       border: 1px solid rgba(255,60,90,.24);
       overflow:hidden;
       min-height: 560px;
@@ -290,13 +287,13 @@
       background: rgba(0,0,0,.25);
     }
 
-    /* ✅ IMPORTANT : plus de scale sinon l'effet glace se décale */
+    /* ✅ IMPORTANT : pas de scale ici sinon l'align glace se décale */
     .bg{
       position:absolute; inset:0;
       background-size: cover;
       background-position:center;
       filter: saturate(1.1) contrast(1.02);
-      transform: none; /* ✅ */
+      transform: none;
     }
 
     .vignette{
@@ -305,25 +302,21 @@
       pointer-events:none;
     }
 
+    /* ✅ GRID : taille FIXE pilotée par --cellSize (plus de “trop grand”) */
     .grid{
       position:absolute; inset: 40px;
       display:grid;
       gap: var(--gap);
       align-content:center;
       justify-content:center;
-      grid-template-columns: repeat(var(--cols), minmax(var(--cellMin), var(--cellMax)));
+      grid-template-columns: repeat(var(--cols), var(--cellSize));
     }
     @media (max-width: 980px){
       .grid{ inset: 18px; }
     }
 
-    /* ✅ layout 3x2: taille auto-fit (via --cellSize) */
-    .grid.is-3x2{
-      grid-template-columns: repeat(3, var(--cellSize));
-    }
-
-    /* ✅ Chaque item = une "tuile" (case + label en dessous) */
     .tile{
+      width: var(--cellSize);
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -332,7 +325,6 @@
       user-select:none;
     }
 
-    /* ✅ La case garde EXACTEMENT son style */
     .cell{
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -343,22 +335,19 @@
 
       border: 1px solid rgba(255,255,255,.18);
       box-shadow: 0 14px 30px rgba(0,0,0,.42), var(--inner);
-
-      /* IMPORTANT: on ne dépend plus de backdrop-filter (export stable) */
       background: rgba(255,255,255,.10);
     }
 
-    /* ✅ Faux glass blur capturable par html2canvas */
+    /* ✅ “glace” plus stable (et pas de carré vide) */
     .cell .glass-bg{
       position:absolute;
-      inset: -18px; /* marge pour éviter les bords du blur */
+      inset: -22px;
       background-repeat: no-repeat;
-      transform: scale(1.08);
-      filter: blur(var(--blur)) saturate(1.15);
-      opacity: .92;
-
-      /* ✅ fallback anti "carré vide" si bg pas prêt */
-      background-color: rgba(255,255,255,.08);
+      background-color: rgba(255,255,255,.07);
+      transform: none;
+      filter: blur(var(--blur)) saturate(1.18) contrast(1.03);
+      opacity: .95;
+      will-change: background-position, background-size, filter;
     }
 
     /* texture “verre” par-dessus */
@@ -366,11 +355,12 @@
       position:absolute;
       inset:0;
       border-radius: var(--r);
-      background: linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06));
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06)),
+        radial-gradient(240px 240px at 18% 12%, rgba(255,255,255,.20), transparent 58%);
       pointer-events:none;
     }
 
-    /* reflet en coin */
     .cell .glass-shine{
       position:absolute;
       inset:-2px;
@@ -381,7 +371,6 @@
       pointer-events:none;
     }
 
-    /* highlight bord */
     .cell .glass-edge{
       position:absolute; inset:0;
       border-radius: var(--r);
@@ -406,6 +395,7 @@
       height: 100%;
       object-fit: contain;
       filter: drop-shadow(0 16px 18px rgba(0,0,0,.50));
+      image-rendering: auto;
     }
 
     .cell .empty{
@@ -420,7 +410,7 @@
       padding: 10px;
     }
 
-    /* ✅ Label sous chaque case (style “overlay” : blanc + contour noir) */
+    /* ✅ Label overlay */
     .cellLabel{
       width: 100%;
       text-align:center;
@@ -429,7 +419,6 @@
       line-height: 1.05;
       text-transform: uppercase;
 
-      /* look proche overlay */
       font-size: 16px;
       color: rgba(255,255,255,.96);
       text-shadow:
@@ -439,28 +428,25 @@
       -webkit-text-stroke: 3px rgba(0,0,0,.92);
       paint-order: stroke fill;
 
-      /* 2 lignes max */
       min-height: var(--labelMinH);
       display:flex;
       align-items:flex-start;
       justify-content:center;
 
-      /* coupe propre */
       overflow:hidden;
       padding: 0 6px;
       word-break: break-word;
 
-      position: relative; /* ✅ pour les aides d'édition */
+      position: relative;
     }
 
-    /* si label vide => on garde la place sans afficher */
     .cellLabel.is-empty{
       color: transparent;
       -webkit-text-stroke: 0px transparent;
       text-shadow: none;
     }
 
-    /* ✅ AIDE D'ÉDITION : zone d'écriture visible à l'écran, invisible à l'export */
+    /* ✅ AIDE D'ÉDITION (visible écran / invisible export) */
     body:not(.exporting) .cellLabel::before{
       content:"";
       position:absolute;
@@ -471,7 +457,6 @@
       box-shadow: 0 10px 20px rgba(0,0,0,.35);
       pointer-events:none;
     }
-
     body:not(.exporting) .cellLabel.is-empty::after{
       content:"✍️ ÉCRIRE ICI";
       position:absolute;
@@ -486,7 +471,6 @@
       -webkit-text-stroke: 0;
       pointer-events:none;
     }
-
     body.exporting .cellLabel::before,
     body.exporting .cellLabel.is-empty::after{
       display:none !important;
@@ -519,7 +503,6 @@
         <label>🎁 2) Choisir un cadeau</label>
         <select id="giftSelect"></select>
 
-        <!-- ✅ Toggle visibilité du menu cadeau -->
         <div class="row" style="margin-top:10px;">
           <label style="display:flex;align-items:center;gap:10px;margin:0;color:rgba(255,255,255,.82);">
             <input type="checkbox" id="visibleGiftMenu" />
@@ -582,7 +565,7 @@
           <button class="btn primary" id="exportPng">Exporter en PNG</button>
         </div>
         <div class="hint">
-          ✅ Export fidèle : même rendu que l’écran (blur stable).
+          ✅ Export fidèle : l’aide “ÉCRIRE ICI” ne sort pas sur le PNG.
         </div>
       </div>
     </div>
@@ -609,6 +592,7 @@
   <script>
     /**
      * ✅ Tes fichiers en RACINE (même niveau que index.html)
+     * (Liste complète conservée)
      */
     const GIFTS = [
       { name: "9 queues 🪙 1800", file: "9 queues.png" },
@@ -797,10 +781,7 @@
       selectedGiftUrl: null,
       selectedGiftName: null,
 
-      // contenu des cases (image)
       cells: [],
-
-      // texte sous les cases
       labels: [],
 
       cols: 5,
@@ -809,7 +790,6 @@
       round: 22,
       gap: 26,
 
-      // background (for accurate faux blur alignment)
       bgUrl: null,
       bgNaturalW: 0,
       bgNaturalH: 0
@@ -841,29 +821,15 @@
     const resetGridBtn = document.getElementById('resetGrid');
     const exportBtn = document.getElementById('exportPng');
 
-    // --------- Utilities
     function setCSSVars(){
       document.documentElement.style.setProperty('--cols', state.cols);
+      document.documentElement.style.setProperty('--rows', state.rows);
       document.documentElement.style.setProperty('--blur', state.blur + 'px');
       document.documentElement.style.setProperty('--r', state.round + 'px');
       document.documentElement.style.setProperty('--gap', state.gap + 'px');
 
       blurVal.textContent = state.blur;
       roundVal.textContent = state.round;
-    }
-
-    function setSelectedGift(gift){
-      if(!gift){
-        state.selectedGiftUrl = null;
-        state.selectedGiftName = null;
-        renderGiftPreview();
-        renderGrid();
-        return;
-      }
-      state.selectedGiftUrl = `./${gift.file}`; // RACINE
-      state.selectedGiftName = gift.name;
-      renderGiftPreview();
-      renderGrid();
     }
 
     function parseCoinsFromName(name){
@@ -908,24 +874,18 @@
       giftThumb.appendChild(img);
     }
 
-    // --------- Layout sizing
-    function apply3x2Sizing(){
-      const inset = (window.innerWidth <= 980) ? 18 : 40;
-      const stageW = stage.clientWidth;
-      const stageH = stage.clientHeight;
-
-      const availW = Math.max(200, stageW - inset * 2);
-      const availH = Math.max(200, stageH - inset * 2);
-
-      let cell = Math.floor(Math.min(availW / 3, availH / 2));
-      cell = Math.min(cell, 210);
-      cell = Math.max(cell, 120);
-
-      const gap = Math.floor(cell * 0.16);
-
-      document.documentElement.style.setProperty('--cellSize', cell + 'px');
-      state.gap = gap;
-      setCSSVars();
+    function setSelectedGift(gift){
+      if(!gift){
+        state.selectedGiftUrl = null;
+        state.selectedGiftName = null;
+        renderGiftPreview();
+        renderGrid();
+        return;
+      }
+      state.selectedGiftUrl = `./${gift.file}`;
+      state.selectedGiftName = gift.name;
+      renderGiftPreview();
+      renderGrid();
     }
 
     function ensureArraysSize(){
@@ -947,33 +907,64 @@
       }
     }
 
+    /**
+     * ✅ IMPORTANT : calcule une taille de case qui rentre TOUJOURS,
+     * donc 5x3 ne sera plus “trop grand”.
+     */
+    function applySizingForLayout(){
+      const inset = (window.innerWidth <= 980) ? 18 : 40;
+
+      const stageW = stage.clientWidth;
+      const stageH = stage.clientHeight;
+
+      const availW = Math.max(200, stageW - inset * 2);
+      const availH = Math.max(200, stageH - inset * 2);
+
+      // place prise par le label sous chaque case (approx)
+      const labelSpace = 56; // px (label + marge)
+      const rows = state.rows;
+      const cols = state.cols;
+
+      // base gap puis recalcul
+      let gap = 26;
+
+      // itération simple : calcule cell avec un gap provisoire
+      const cellW = Math.floor((availW - (cols - 1) * gap) / cols);
+      const cellH = Math.floor((availH - (rows - 1) * gap) / rows - labelSpace);
+
+      let cell = Math.min(cellW, cellH);
+
+      // clamps
+      const minCell = (window.innerWidth <= 980) ? 92 : 110;
+      const maxCell = 190;
+      cell = Math.max(minCell, Math.min(maxCell, cell));
+
+      // gap dépend de la taille (plus joli)
+      gap = Math.round(Math.max(14, Math.min(34, cell * 0.14)));
+
+      document.documentElement.style.setProperty('--cellSize', cell + 'px');
+      state.gap = gap;
+
+      setCSSVars();
+      requestAnimationFrame(updateGlassAlignment);
+    }
+
     function setLayout(value){
       const [c, r] = value.split('x').map(Number);
       state.cols = c;
       state.rows = r;
 
-      grid.classList.toggle('is-3x2', (c === 3 && r === 2));
-
-      state.gap = 26;
-
       state.cells = new Array(c * r).fill(null);
       state.labels = new Array(c * r).fill('');
 
-      setCSSVars();
-
-      if(c === 3 && r === 2){
-        apply3x2Sizing();
-      }
-
+      applySizingForLayout();
       renderGrid();
-      requestAnimationFrame(updateGlassAlignment);
     }
 
     // --------- Faux blur alignment
     function computeCoverParams(){
-      if(!state.bgUrl || !state.bgNaturalW || !state.bgNaturalH){
-        return null;
-      }
+      if(!state.bgUrl || !state.bgNaturalW || !state.bgNaturalH) return null;
+
       const stageW = stage.clientWidth;
       const stageH = stage.clientHeight;
 
@@ -1018,17 +1009,15 @@
       });
     }
 
-    // --------- Label helper
     function editLabelAt(index){
       const current = (state.labels[index] || '').toString();
       const next = prompt("Texte sous la case (vide = supprimer) :", current);
-      if(next === null) return; // annuler
+      if(next === null) return;
       state.labels[index] = (next || '').trim();
       renderGrid();
       requestAnimationFrame(updateGlassAlignment);
     }
 
-    // --------- Grid render (case + label dessous)
     function renderGrid(){
       ensureArraysSize();
       grid.innerHTML = '';
@@ -1079,14 +1068,11 @@
           cell.appendChild(empty);
         }
 
-        // interactions
         cell.addEventListener('click', (e) => {
-          // Ctrl+clic / ⌘ => éditer le texte
           if(e.ctrlKey || e.metaKey){
             editLabelAt(i);
             return;
           }
-
           if(!state.selectedGiftUrl) return;
           state.cells[i] = state.selectedGiftUrl;
           renderGrid();
@@ -1099,13 +1085,11 @@
           requestAnimationFrame(updateGlassAlignment);
         });
 
-        // clic droit = éditer le label
         cell.addEventListener('contextmenu', (e) => {
           e.preventDefault();
           editLabelAt(i);
         });
 
-        // Label sous la case
         const label = document.createElement('div');
         label.className = 'cellLabel';
         const txt = (state.labels[i] || '').trim();
@@ -1117,7 +1101,6 @@
           label.textContent = txt;
         }
 
-        // double-clic sur le label = éditer
         label.addEventListener('dblclick', () => editLabelAt(i));
 
         tile.appendChild(cell);
@@ -1139,13 +1122,21 @@
         state.bgNaturalH = img.naturalHeight;
 
         bg.style.backgroundImage = `url("${url}")`;
-        requestAnimationFrame(updateGlassAlignment);
+
+        requestAnimationFrame(() => {
+          applySizingForLayout();
+          updateGlassAlignment();
+        });
       };
       img.onerror = () => {
         bg.style.backgroundImage = `url("${url}")`;
         state.bgNaturalW = 0;
         state.bgNaturalH = 0;
-        requestAnimationFrame(updateGlassAlignment);
+
+        requestAnimationFrame(() => {
+          applySizingForLayout();
+          updateGlassAlignment();
+        });
       };
       img.src = url;
     }
@@ -1182,7 +1173,7 @@
       setSelectedGift(null);
     });
 
-    // --------- Toggle "menu plus visible"
+    // --------- Toggle menu cadeau
     visibleGiftMenu.addEventListener('change', () => {
       document.body.classList.toggle('high-contrast-select', visibleGiftMenu.checked);
     });
@@ -1207,15 +1198,12 @@
       renderGrid();
     });
 
-    // resize: keep faux blur aligned + 3x2 sizing responsive
     window.addEventListener('resize', () => {
-      if(state.cols === 3 && state.rows === 2){
-        apply3x2Sizing();
-      }
+      applySizingForLayout();
       requestAnimationFrame(updateGlassAlignment);
     });
 
-    // --------- Export PNG (aides invisibles)
+    // --------- Export PNG (✅ cache vraiment les aides + timing sûr)
     async function waitForImages(root){
       const imgs = Array.from(root.querySelectorAll('img'));
       await Promise.all(imgs.map(img => {
@@ -1227,13 +1215,21 @@
       }));
     }
 
+    function nextFrame(){
+      return new Promise(res => requestAnimationFrame(() => res()));
+    }
+
     exportBtn.addEventListener('click', async () => {
       try{
         exportBtn.disabled = true;
         exportBtn.textContent = "⏳ Export en cours...";
 
-        // ✅ cache les aides d’édition (zone d'écriture)
+        // ✅ cache les aides d’édition
         document.body.classList.add('exporting');
+
+        // ✅ laisse 2 frames pour être sûr que html2canvas capture SANS pseudo-elements
+        await nextFrame();
+        await nextFrame();
 
         updateGlassAlignment();
         await waitForImages(stage);
@@ -1264,14 +1260,15 @@
 
     // --------- Init
     renderGiftSelect();
-    setLayout(layout.value);
 
     state.blur = Number(blurRange.value);
     state.round = Number(roundRange.value);
     setCSSVars();
 
+    setLayout(layout.value);
     renderGiftPreview();
     renderGrid();
+    applySizingForLayout();
   </script>
 </body>
 </html>
