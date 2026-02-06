@@ -25,17 +25,20 @@
 
       --shadow: 0 18px 40px rgba(0,0,0,.45);
       --inner: inset 0 1px 0 rgba(255,255,255,.16), inset 0 -18px 40px rgba(0,0,0,.35);
-
       --r: 22px;
 
       /* grid vars */
       --cols: 5;
+      --rows: 3;
+      --blur: 16px;
       --gap: 26px;
+
+      /* ✅ taille calculée (TOUTES dispositions) */
       --cellSize: 150px;
 
-      /* label */
+      /* label sizing */
       --labelGap: 10px;
-      --labelMinH: 2.4em;
+      --labelMinH: 2.4em; /* ~2 lignes */
     }
 
     *{ box-sizing:border-box; }
@@ -185,6 +188,7 @@
       box-shadow: 0 0 0 3px rgba(255,60,90,.08);
     }
 
+    /* ✅ Mode "menu cadeau plus visible" (toggle) */
     body.high-contrast-select select{
       background: rgba(0,0,0,.55);
       border-color: rgba(255,60,90,.65);
@@ -272,7 +276,7 @@
       color: rgba(255,255,255,.88);
     }
 
-    /* ✅ STAGE rectangle */
+    /* ✅ STAGE = rectangle parfait */
     .stage{
       position:relative;
       border-radius: 0px;
@@ -283,6 +287,7 @@
       background: rgba(0,0,0,.25);
     }
 
+    /* ✅ IMPORTANT : pas de scale ici sinon l'align glace se décale */
     .bg{
       position:absolute; inset:0;
       background-size: cover;
@@ -297,7 +302,7 @@
       pointer-events:none;
     }
 
-    /* ✅ GRID : taille calculée -> plus de 5x3 trop grand */
+    /* ✅ GRID : taille FIXE pilotée par --cellSize (plus de “trop grand”) */
     .grid{
       position:absolute; inset: 40px;
       display:grid;
@@ -333,21 +338,20 @@
       background: rgba(255,255,255,.10);
     }
 
-    /* ✅ ICI : la "glace" est une IMAGE (pré-rendue au canvas) */
-    .glass-bg{
+    /* ✅ “glace” plus stable (et pas de carré vide) */
+    .cell .glass-bg{
       position:absolute;
-      inset:-24px; /* padding pour le flou aux bords */
-      opacity:.95;
-      pointer-events:none;
-    }
-    .glass-bg img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
+      inset: -22px;
+      background-repeat: no-repeat;
+      background-color: rgba(255,255,255,.07);
+      transform: none;
+      filter: blur(var(--blur)) saturate(1.18) contrast(1.03);
+      opacity: .95;
+      will-change: background-position, background-size, filter;
     }
 
-    .glass-tint{
+    /* texture “verre” par-dessus */
+    .cell .glass-tint{
       position:absolute;
       inset:0;
       border-radius: var(--r);
@@ -357,7 +361,7 @@
       pointer-events:none;
     }
 
-    .glass-shine{
+    .cell .glass-shine{
       position:absolute;
       inset:-2px;
       background:
@@ -367,7 +371,7 @@
       pointer-events:none;
     }
 
-    .glass-edge{
+    .cell .glass-edge{
       position:absolute; inset:0;
       border-radius: var(--r);
       box-shadow: inset 0 1px 0 rgba(255,255,255,.22);
@@ -379,22 +383,22 @@
       box-shadow: 0 14px 30px rgba(0,0,0,.42), var(--inner), 0 0 0 3px rgba(255,60,90,.10);
     }
 
-    .giftInCell{
+    .cell .giftInCell{
       position:absolute; inset: 16%;
       display:flex;
       align-items:center;
       justify-content:center;
       pointer-events:none;
-      z-index: 2;
     }
-    .giftInCell img{
+    .cell .giftInCell img{
       width: 100%;
       height: 100%;
       object-fit: contain;
       filter: drop-shadow(0 16px 18px rgba(0,0,0,.50));
+      image-rendering: auto;
     }
 
-    .empty{
+    .cell .empty{
       position:absolute; inset:0;
       display:flex;
       align-items:center;
@@ -404,9 +408,9 @@
       pointer-events:none;
       text-align:center;
       padding: 10px;
-      z-index: 2;
     }
 
+    /* ✅ Label overlay */
     .cellLabel{
       width: 100%;
       text-align:center;
@@ -434,7 +438,6 @@
       word-break: break-word;
 
       position: relative;
-      z-index: 3;
     }
 
     .cellLabel.is-empty{
@@ -562,7 +565,7 @@
           <button class="btn primary" id="exportPng">Exporter en PNG</button>
         </div>
         <div class="hint">
-          ✅ Export stable : l’effet glace est pré-rendu (canvas) donc identique au PNG.
+          ✅ Export fidèle : l’aide “ÉCRIRE ICI” ne sort pas sur le PNG.
         </div>
       </div>
     </div>
@@ -589,15 +592,189 @@
   <script>
     /**
      * ✅ Tes fichiers en RACINE (même niveau que index.html)
-     * (j’ai gardé le principe : tu peux remettre ta liste complète si besoin)
+     * (Liste complète conservée)
      */
     const GIFTS = [
-      { name: "rose 🪙 1", file: "rose.png" },
+      { name: "9 queues 🪙 1800", file: "9 queues.png" },
+      { name: "2026 🪙 1", file: "2026.png" },
+      { name: "je t'adore 🪙 1", file: "adore.png" },
+      { name: "Aile de papillon 🪙 399", file: "Aile de papillon.png" },
+      { name: "ailes fée 🪙 1", file: "ailesfee.png" },
+      { name: "Boîtes de largage 🪙 999 ", file: "Air drop.png" },
+      { name: "Ami Fruités 🪙 299", file: "Ami Fruités.png" },
+      { name: "amour langue signe 🪙 49", file: "amourlanguesigne.png" },
+      { name: "Animaux en scène 🪙 2500", file: "Animal Band.png" },
+      { name: "Arbre à diamants 🪙 1088", file: "Arbre à diamants.png" },
+      { name: "arc amour 🪙 99", file: "arcamour.png" },
+      { name: "arc en ciel 🪙 1", file: "arcenciel.png" },
+      { name: "bagel 🪙 35", file: "bagel.png" },
+      { name: "Singe Encourageant 🪙 349", file: "baking monkey.png" },
+      { name: "Plongée Baleine 🪙 2150", file: "Baleine.png" },
+      { name: "ballon coeur 🪙 150", file: "ballonamour.png" },
+      { name: "Stand des Amoureux 🪙 2199", file: "Bar à citron.png" },
       { name: "basketball 🪙 1", file: "basketball.png" },
+      { name: "Batterie 🪙 1000", file: "Batterie.png" },
+      { name: "Ours Surfeur 🪙 800", file: "Bear Blind Box.Png" },
+      { name: "Devenir un Chaton 🪙 349", file: "Become Kitten.png" },
+      { name: "Benny Bébé Rhino 🪙 4999", file: "Berry.png" },
+      { name: "Bisous Loutre 🪙 399", file: "Bisous Loutre.png" },
+      { name: "bisous 🪙 1", file: "bisous.png" },
+      { name: "bubblegum 🪙 99", file: "bubblegum.png" },
+      { name: "calin de teddy 🪙 399", file: "calin de teddy.png" },
+      { name: "Camion de glace 🪙 2988", file: "Camion de glace.png" },
+      { name: "Capybara 🪙 30", file: "capybara.png" },
+      { name: "Carrousel 🪙 1999", file: "Carrousel.png" },
+      { name: "Carte de Voeux 🪙 1500", file: "carte de voeux.png" },
+      { name: "Casquette 🪙 99", file: "Casquette.png" },
+      { name: "Chaise Gaming 🪙 1200", file: "Chaise Gaming.png" },
+      { name: "chapeau moustache 🪙 99", file: "chapeaumoustache.png" },
+      { name: "Génial 🪙 1", file: "chaton.png" },
+      { name: "Chaos de la Chenille 🪙 149", file: "chenilledodo.png" },
+      { name: "Compagnon Citronnée 🪙 199", file: "citronnade.png" },
+      { name: "Clavier Gaming 🪙 4000", file: "Clavier gamer.png" },
+      { name: "Cochon Amoureux 🪙 10", file: "cochonamoureux.Png" },
+
+      { name: "Coeur 🪙 199", file: "Coeur bisous.png" },
+      { name: "Coeur Unis 🪙 299", file: "Coeur Uni.png" },
+      { name: "Coeur avec les mains 🪙 100", file: "coeuraveclesmains.png" },
+      { name: "Coeur dans les mains 🪙 100", file: "Coeurdanslesmains.png" },
+      { name: "coeur doigt 🪙 5", file: "coeurdoigt.png" },
+      { name: "coeur du jour 🪙 1", file: "coeurdujour.png" },
+      { name: "coeur en flammes 🪙 1", file: "coeureenflammes.png" },
       { name: "coeur nuage 🪙 1", file: "coeurnuage.png" },
-      { name: "Super GG 🪙 100", file: "supergg.png" },
+
+      { name: "Collier amitié 🪙 10", file: "collierami.png" },
+      { name: "Saxophone de Rosie 🪙 399 ", file: "Concert de Rosie.png" },
+      { name: "Confettis 🪙 100", file: "confetti.png" },
+      { name: "Cool 🪙 1", file: "Cool.png" },
+      { name: "Cooper rentre en.. 🪙 1999", file: "Cooper.png" },
+      { name: "Coquillage 🪙 100", file: "coquillage.png" },
+      { name: "Corail 🪙 499", file: "corail.png" },
+      { name: "Corgi 🪙 299", file: "corgi.png" },
+      { name: "Cote à Côte 🪙 199", file: "Coteacote.png" },
+      { name: "Couple puissant 🪙 2000", file: "Couple puissant.png" },
+      { name: "Couronnes Dragon 🪙 500", file: "Couronnes Dragon.png" },
+      { name: "Couronne TikTok 🪙 299", file: "couronnes TikTok.png" },
+      { name: "Crabe acclamant 🪙 199", file: "crabe.png" },
+      { name: "Crinière Lion 🪙 500", file: "Crinière lion.png" },
+      { name: "Cygne 🪙 699", file: "cygne.png" },
+      { name: "Ours Rythmique 🪙 2999", file: "Dancing Bear.png" },
+      { name: "Fusil à Diamant 🪙 5000", file: "Diamond gun.png" },
+      { name: "Casquette Dino 🪙 200", file: "dinocap.png" },
+      { name: "Lunettes de DJ 🪙 500", file: "Dj glasses.Png" },
+      { name: "Donut 🪙 30", file: "donuts.png" },
+      { name: "Drift en voiture 🪙 3000", file: "Drift.png" },
+      { name: "eclair 🪙 1", file: "eclair.png" },
+      { name: "Elise l'éléphante 🪙 5000", file: "Elise l'éléphant.Png" },
+      { name: "Empreinte de Dino 🪙 1", file: "empreintedino.png" },
+      { name: "etoile étincelante 🪙 199", file: "etoileetincelante.png" },
+      { name: "Famille 🪙 90", file: "famille.png" },
+      { name: "Feu d'artifice 🪙 1088", file: "Feu d'artifice.png" },
+      { name: "Puissance Max 🪙399", file: "Fire up.png" },
+      { name: "Poing contre Poing 🪙 90", file: "fistbump.png" },
+
+      { name: " Bouée Flamant Rose 🪙999", file: "flamant rose.Png" },
+      { name: "fleur S 🪙 20", file: "fleurenS.png" },
+      { name: "Rencontre du Futur 🪙 1500", file: "Futur.png" },
+      { name: "Galaxie 🪙 1000", file: "Galaxie.png" },
+      { name: "Ours Gameur 🪙 4088", file: "Gaming Bear.png" },
+      { name: "Gant de Boxe 🪙 299", file: "gantdeboxe.png" },
+      { name: "Gant Dorée 🪙 10", file: "gantdorée.png" },
+      { name: "Part de Gateau D'anniversaire 🪙 1", file: "gateauanniv.png" },
+      { name: "Part de Gateau 🪙 1", file: "gateaupart.png" },
+      { name: "gg 🪙 1", file: "gg.png" },
+      { name: "Girafe 🪙 1000", file: "Girafe.Png" },
+      { name: "Glace 🪙 5", file: "glace.png" },
+      { name: "Bâton brillant 🪙 1", file: "glow.png" },
+      { name: "Grande Rose 🪙 500", file: "Grande Roses.png" },
+      { name: "Grue 🪙 100", file: "grue.png" },
+      { name: "Parôle d'amour 🪙 1", file: "heartlytalyk.png" },
+      { name: "ice-cream 🪙 1", file: "ice-cream.png" },
+      { name: "Jet volant 🪙 5000 ", file: "Jet volant.png" },
+      { name: "Je T'aime 🪙 199", file: "jetaime.png" },
+      { name: "Pass Aventure 🪙 10", file: "journepass.png" },
+      { name: "Sourire Juteux 🪙 199", file: "juicysmile.png" },
+      { name: "Eau De Coco 🪙 199", file: "jusdecoco.png" },
+      { name: "Leon le chaton 🪙 4888", file: "Leon le chaton.png" },
+      { name: "Loup d'arabie 🪙 5500", file: "Loup D'arabie.png" },
+      { name: "Peinture D'amour 🪙 99", file: "lovepainting.png" },
+      { name: "Lunettes de Soleil 🪙 199", file: "lunettesdesoleil.png" },
+      { name: "Magie du Café 🪙 199 ", file: "magieducafe.png" },
+      { name: "Mama Mia 🪙 1", file: "mamamia.png" },
+      { name: "Manettes 🪙 100", file: "Manettes.png" },
+      { name: "Manifestation XXL 🪙 1500", file: "Manifestation XXL.png" },
+      { name: "Amour Astronaute 🪙 349", file: "Marked With love.png" },
+      { name: "Marque D'amour 🪙 99", file: "marquedamour.png" },
+      { name: "Masque Pharaon 🪙 399", file: "masque pharaon.png" },
+      { name: "masque 🪙 149", file: "masque.png" },
+      { name: "Un grand Bravo 🪙 149", file: "megaphone.png" },
+      { name: "Pistolet Billets 🪙 500", file: "Money Gun.png" },
+      { name: "Magnettes d'argent 🪙 549", file: "Money Magnet.png" },
+      { name: "Mongolfiere 🪙 1000", file: "Mongolfiere.Png" },
+
+      { name: "Fleur clair de Lune 🪙 1400", file: "Moonlight Flower.png" },
+      { name: "Moto 🪙 2988", file: "Moto.png" },
+      { name: "noeud papillon 🪙 149", file: "noeudpapillon.png" },
+      { name: "Oie Détendu 🪙 399", file: "Oie détendu.png" },
+      { name: "Bisous Joyeux 🪙 199", file: "oiseau.png" },
+      { name: "Ours Dansant 🪙 3000", file: "ours rythmic.png" },
+      { name: "Ours de Rose 🪙 214", file: "oursderose.png" },
+      { name: "Ourson 🪙 100", file: "ourson.png" },
+      { name: "Panda Climb 🪙 199", file: "pandaclimb.png" },
+      { name: "Papillon 🪙 88", file: "Papillon.png" },
+      { name: "Parfum 🪙 20", file: "parfum.png" },
+      { name: "Bus Festif 🪙 2999", file: "Party Bus.png" },
+      { name: "Patate qui flotte 🪙 1500", file: "Patate qui flottre.png" },
+      { name: "Pêche 🪙 5", file: "peche.png" },
+      { name: "Petite couronne 🪙 99", file: "petitecouronne.png" },
+      { name: "Pingouin qui surf 🪙 249", file: "pingouinsurf.png" },
       { name: "Pluie de météores 🪙 3000", file: "Pluie de météore.png" },
-      // 🔁 Remets ici ta liste complète (inchangée) si tu veux tout
+      { name: "Pneu 🪙 1", file: "pneu.png" },
+      { name: "Polaris 🪙 500", file: "Polaris.png" },
+      { name: "Popcorn 🪙 149", file: "popcorn.png" },
+      { name: "Populaire 🪙 1", file: "populaire.png" },
+      { name: "Positivité 🪙 199", file: "positivité.png" },
+      { name: "Pouce vers le haut 🪙 2", file: "pouceverslehaut.png" },
+      { name: "Poulet espiègles 🪙 299", file: "Poulet espiègles.png" },
+      { name: "Poulpe 🪙 199", file: "poulpe.png" },
+      { name: "Poursuit tes rêves 🪙 1500", file: "Poursuit tes reves.png" },
+      { name: "Prince 🪙 500", file: "Prince.png" },
+      { name: "Jet Privé 🪙 4888", file: "Private Jet.png" },
+      { name: "Bisous Chiot 🪙 299", file: "Puppy kiss.png" },
+      { name: "Refuge de l'amour 🪙 1200", file: "Refude de l'amour.png" },
+      { name: "Rocky Rockeur 🪙 399", file: "Rocky.png" },
+      { name: "Rosa 🪙 10", file: "rosa.png" },
+      { name: "Rose à jamais 🪙 399", file: "Rose à jamais.png" },
+      { name: "Rose à Main 🪙 199", file: "Rose pour toi.png" },
+      { name: "rose 🪙 1", file: "rose.png" },
+      { name: "rose blanche 🪙 1", file: "roseblanche.png" },
+      { name: "Sage Futé 🪙 399", file: "sage intelligent.png" },
+      { name: "slay 🪙 1", file: "slay.png" },
+      { name: "Sous contrôles 🪙 1500", file: "Sous contrôles.Png" },
+
+      { name: "Chat de L'espace 🪙 1500", file: "Space Cat.png" },
+      { name: "Chien de L'espace 🪙 2500", file: "Space dog.png" },
+      { name: "Steven Wingman 🪙 1", file: "steven.png" },
+      { name: "Super GG 🪙 100", file: "supergg.png" },
+      { name: "Super Populaire 🪙 9", file: "superpopulaire.png" },
+      { name: "Taureau 🪙 3000", file: "taureau.Png" },
+      { name: "Tcheck 🪙 299", file: "tcheck.png" },
+      { name: "tiktok 🪙 1", file: "tiktok.png" },
+      { name: "Tofu 🪙 5", file: "tofu.png" },
+      { name: "Tom la Tomate 🪙 1", file: "tomtomate.png" },
+      { name: "Ton concert 🪙 4500", file: "ton concert.png" },
+      { name: "Train 🪙 899", file: "Train.png" },
+      { name: "transfo patate 🪙 150", file: "transfopatate.png" },
+      { name: "Trompe D'éléphant 🪙 299", file: "trompe d'éléphant.png" },
+      { name: "Trophée Basket 🪙 700", file: "Trophée Basket.png" },
+      { name: "umake me so happy 🪙 30", file: "umakemisohappy.png" },
+      { name: "Vaisseau de Level 🪙 1500", file: "Vaisseau de Level.png" },
+      { name: "Vaisseau spatial 🪙 4999", file: "Vaisseau spacial.png" },
+      { name: "Voyage avec toi 🪙 999", file: "Voyage avec toi.png" },
+      { name: "Mercredi Gagnant 🪙 99", file: "winningwednesday.png" },
+      { name: "FLeurs XXXL 🪙 500", file: "XXL flower.png" },
+      { name: "you are my jam 🪙 30", file: "youaremyjam.png" },
+      { name: "you are on a roll 🪙 30", file: "youaremyroll.png" }
     ];
 
     const state = {
@@ -614,7 +791,6 @@
       gap: 26,
 
       bgUrl: null,
-      bgImg: null,        // Image() chargée
       bgNaturalW: 0,
       bgNaturalH: 0
     };
@@ -633,6 +809,7 @@
     const deselectBtn = document.getElementById('deselect');
 
     const visibleGiftMenu = document.getElementById('visibleGiftMenu');
+
     const layout = document.getElementById('layout');
 
     const blurRange = document.getElementById('blur');
@@ -644,11 +821,13 @@
     const resetGridBtn = document.getElementById('resetGrid');
     const exportBtn = document.getElementById('exportPng');
 
-    // ---------- Utils
     function setCSSVars(){
       document.documentElement.style.setProperty('--cols', state.cols);
-      document.documentElement.style.setProperty('--gap', state.gap + 'px');
+      document.documentElement.style.setProperty('--rows', state.rows);
+      document.documentElement.style.setProperty('--blur', state.blur + 'px');
       document.documentElement.style.setProperty('--r', state.round + 'px');
+      document.documentElement.style.setProperty('--gap', state.gap + 'px');
+
       blurVal.textContent = state.blur;
       roundVal.textContent = state.round;
     }
@@ -712,6 +891,9 @@
     function ensureArraysSize(){
       const total = state.cols * state.rows;
 
+      if(!Array.isArray(state.cells)) state.cells = [];
+      if(!Array.isArray(state.labels)) state.labels = [];
+
       if(state.cells.length !== total){
         const old = state.cells.slice();
         state.cells = new Array(total).fill(null);
@@ -719,60 +901,69 @@
       }
 
       if(state.labels.length !== total){
-        const old = state.labels.slice();
+        const oldL = state.labels.slice();
         state.labels = new Array(total).fill('');
-        for(let i=0; i<Math.min(old.length, total); i++) state.labels[i] = old[i] || '';
+        for(let i=0; i<Math.min(oldL.length, total); i++) state.labels[i] = oldL[i] || '';
       }
     }
 
-    // ---------- Sizing (fix 5x3 trop grand)
-    function applySizing(){
+    /**
+     * ✅ IMPORTANT : calcule une taille de case qui rentre TOUJOURS,
+     * donc 5x3 ne sera plus “trop grand”.
+     */
+    function applySizingForLayout(){
       const inset = (window.innerWidth <= 980) ? 18 : 40;
+
       const stageW = stage.clientWidth;
       const stageH = stage.clientHeight;
 
       const availW = Math.max(200, stageW - inset * 2);
       const availH = Math.max(200, stageH - inset * 2);
 
-      const cols = state.cols;
+      // place prise par le label sous chaque case (approx)
+      const labelSpace = 56; // px (label + marge)
       const rows = state.rows;
+      const cols = state.cols;
 
-      // place du label sous chaque case
-      const labelSpace = 56;
+      // base gap puis recalcul
+      let gap = 26;
 
-      // on choisit un gap de départ, puis on ajuste
-      let gap = 22;
-
+      // itération simple : calcule cell avec un gap provisoire
       const cellW = Math.floor((availW - (cols - 1) * gap) / cols);
-      const cellH = Math.floor(((availH - (rows - 1) * gap) / rows) - labelSpace);
+      const cellH = Math.floor((availH - (rows - 1) * gap) / rows - labelSpace);
+
       let cell = Math.min(cellW, cellH);
 
+      // clamps
       const minCell = (window.innerWidth <= 980) ? 92 : 110;
       const maxCell = 190;
       cell = Math.max(minCell, Math.min(maxCell, cell));
 
+      // gap dépend de la taille (plus joli)
       gap = Math.round(Math.max(14, Math.min(34, cell * 0.14)));
 
       document.documentElement.style.setProperty('--cellSize', cell + 'px');
       state.gap = gap;
 
       setCSSVars();
+      requestAnimationFrame(updateGlassAlignment);
     }
 
     function setLayout(value){
       const [c, r] = value.split('x').map(Number);
       state.cols = c;
       state.rows = r;
+
       state.cells = new Array(c * r).fill(null);
       state.labels = new Array(c * r).fill('');
-      applySizing();
+
+      applySizingForLayout();
       renderGrid();
-      requestAnimationFrame(renderAllGlassTiles);
     }
 
-    // ---------- Background cover params
+    // --------- Faux blur alignment
     function computeCoverParams(){
-      if(!state.bgImg || !state.bgNaturalW || !state.bgNaturalH) return null;
+      if(!state.bgUrl || !state.bgNaturalW || !state.bgNaturalH) return null;
 
       const stageW = stage.clientWidth;
       const stageH = stage.clientHeight;
@@ -787,133 +978,46 @@
       return { drawnW, drawnH, offsetX, offsetY };
     }
 
-    // ---------- ✅ GLASS RENDER (canvas -> image)
-    async function renderAllGlassTiles(){
-      const cells = Array.from(grid.querySelectorAll('.cell'));
-      if(cells.length === 0) return;
+    function updateGlassAlignment(){
+      const params = computeCoverParams();
+      const cells = grid.querySelectorAll('.cell');
 
-      // si pas de bg: met un fallback doux (toujours exportable)
-      if(!state.bgImg){
+      if(!params){
         cells.forEach(cell => {
-          const img = cell.querySelector('.glass-bg img');
-          if(img){
-            img.src = makeFallbackGlassDataURL(cell.clientWidth + 48, cell.clientHeight + 48);
-          }
+          const gb = cell.querySelector('.glass-bg');
+          if(!gb) return;
+          gb.style.backgroundImage = '';
+          gb.style.background = 'linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.04))';
         });
         return;
       }
 
-      const params = computeCoverParams();
-      if(!params) return;
-
-      const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1)); // limite pour perf + stabilité
-      const stageW = stage.clientWidth;
-      const stageH = stage.clientHeight;
-
-      // canvas global du fond (cover)
-      const stageCanvas = document.createElement('canvas');
-      stageCanvas.width = Math.floor(stageW * dpr);
-      stageCanvas.height = Math.floor(stageH * dpr);
-      const sctx = stageCanvas.getContext('2d', { alpha: true });
-
-      sctx.setTransform(dpr,0,0,dpr,0,0);
-      // draw cover
-      sctx.drawImage(
-        state.bgImg,
-        params.offsetX, params.offsetY,
-        params.drawnW, params.drawnH
-      );
-
       const stageRect = stage.getBoundingClientRect();
-      const pad = 24; // doit matcher .glass-bg inset
 
-      for(const cell of cells){
-        const gbImg = cell.querySelector('.glass-bg img');
-        if(!gbImg) continue;
+      cells.forEach(cell => {
+        const gb = cell.querySelector('.glass-bg');
+        if(!gb) return;
 
         const rect = cell.getBoundingClientRect();
         const left = rect.left - stageRect.left;
         const top  = rect.top  - stageRect.top;
 
-        const w = rect.width;
-        const h = rect.height;
-
-        const outW = Math.max(1, Math.floor((w + pad*2) * dpr));
-        const outH = Math.max(1, Math.floor((h + pad*2) * dpr));
-
-        const tile = document.createElement('canvas');
-        tile.width = outW;
-        tile.height = outH;
-        const tctx = tile.getContext('2d', { alpha: true });
-
-        // blur en pixels (adapter dpr)
-        tctx.filter = `blur(${Math.max(0, state.blur) * dpr}px)`;
-        // on prélève un morceau du stageCanvas
-        const sx = Math.floor((left - pad) * dpr);
-        const sy = Math.floor((top  - pad) * dpr);
-
-        // clamp source
-        const csx = Math.max(0, sx);
-        const csy = Math.max(0, sy);
-        const csw = Math.min(stageCanvas.width - csx, outW - Math.max(0, csx - sx));
-        const csh = Math.min(stageCanvas.height - csy, outH - Math.max(0, csy - sy));
-
-        // destination offset si clamp
-        const dx = Math.max(0, csx - sx);
-        const dy = Math.max(0, csy - sy);
-
-        if(csw > 0 && csh > 0){
-          tctx.drawImage(stageCanvas, csx, csy, csw, csh, dx, dy, csw, csh);
-        }
-
-        // petit boost de lumière (verre)
-        tctx.filter = 'none';
-        tctx.globalAlpha = 0.22;
-        const g = tctx.createLinearGradient(0,0,outW,outH);
-        g.addColorStop(0, 'rgba(255,255,255,.55)');
-        g.addColorStop(1, 'rgba(255,255,255,0)');
-        tctx.fillStyle = g;
-        tctx.fillRect(0,0,outW,outH);
-        tctx.globalAlpha = 1;
-
-        gbImg.src = tile.toDataURL('image/png');
-      }
+        gb.style.background = 'none';
+        gb.style.backgroundImage = `url("${state.bgUrl}")`;
+        gb.style.backgroundSize = `${params.drawnW}px ${params.drawnH}px`;
+        gb.style.backgroundPosition = `${params.offsetX - left}px ${params.offsetY - top}px`;
+      });
     }
 
-    function makeFallbackGlassDataURL(w, h){
-      const c = document.createElement('canvas');
-      c.width = Math.max(1, Math.floor(w));
-      c.height = Math.max(1, Math.floor(h));
-      const ctx = c.getContext('2d');
-
-      const g = ctx.createLinearGradient(0,0,c.width,c.height);
-      g.addColorStop(0, 'rgba(255,255,255,.20)');
-      g.addColorStop(1, 'rgba(255,255,255,.05)');
-      ctx.fillStyle = g;
-      ctx.fillRect(0,0,c.width,c.height);
-
-      // micro texture
-      ctx.globalAlpha = 0.10;
-      for(let i=0;i<120;i++){
-        ctx.fillStyle = 'rgba(255,255,255,.25)';
-        ctx.fillRect(Math.random()*c.width, Math.random()*c.height, 1, 1);
-      }
-      ctx.globalAlpha = 1;
-
-      return c.toDataURL('image/png');
-    }
-
-    // ---------- Labels
     function editLabelAt(index){
       const current = (state.labels[index] || '').toString();
       const next = prompt("Texte sous la case (vide = supprimer) :", current);
       if(next === null) return;
       state.labels[index] = (next || '').trim();
       renderGrid();
-      requestAnimationFrame(renderAllGlassTiles);
+      requestAnimationFrame(updateGlassAlignment);
     }
 
-    // ---------- Grid
     function renderGrid(){
       ensureArraysSize();
       grid.innerHTML = '';
@@ -927,13 +1031,9 @@
         const cell = document.createElement('div');
         cell.className = 'cell';
 
-        // glass bg image (pre-render)
+        // glass layers
         const glassBg = document.createElement('div');
         glassBg.className = 'glass-bg';
-        const gbImg = document.createElement('img');
-        gbImg.alt = 'glass';
-        gbImg.src = makeFallbackGlassDataURL(220,220);
-        glassBg.appendChild(gbImg);
 
         const glassTint = document.createElement('div');
         glassTint.className = 'glass-tint';
@@ -954,9 +1054,11 @@
         if(url){
           const wrap = document.createElement('div');
           wrap.className = 'giftInCell';
+
           const img = document.createElement('img');
           img.src = url;
           img.alt = 'gift';
+
           wrap.appendChild(img);
           cell.appendChild(wrap);
         } else {
@@ -974,13 +1076,13 @@
           if(!state.selectedGiftUrl) return;
           state.cells[i] = state.selectedGiftUrl;
           renderGrid();
-          requestAnimationFrame(renderAllGlassTiles);
+          requestAnimationFrame(updateGlassAlignment);
         });
 
         cell.addEventListener('dblclick', () => {
           state.cells[i] = null;
           renderGrid();
-          requestAnimationFrame(renderAllGlassTiles);
+          requestAnimationFrame(updateGlassAlignment);
         });
 
         cell.addEventListener('contextmenu', (e) => {
@@ -991,47 +1093,49 @@
         const label = document.createElement('div');
         label.className = 'cellLabel';
         const txt = (state.labels[i] || '').trim();
+
         if(!txt){
           label.classList.add('is-empty');
           label.textContent = '—';
         } else {
           label.textContent = txt;
         }
+
         label.addEventListener('dblclick', () => editLabelAt(i));
 
         tile.appendChild(cell);
         tile.appendChild(label);
         grid.appendChild(tile);
       }
+
+      requestAnimationFrame(updateGlassAlignment);
     }
 
-    // ---------- Background
+    // --------- Background upload
     async function setBackgroundFromUrl(url){
       state.bgUrl = url;
 
       const img = new Image();
       img.crossOrigin = "anonymous";
       img.onload = () => {
-        state.bgImg = img;
         state.bgNaturalW = img.naturalWidth;
         state.bgNaturalH = img.naturalHeight;
 
         bg.style.backgroundImage = `url("${url}")`;
+
         requestAnimationFrame(() => {
-          applySizing();
-          renderAllGlassTiles();
+          applySizingForLayout();
+          updateGlassAlignment();
         });
       };
       img.onerror = () => {
-        // si erreur, on affiche quand même mais sans bgImg -> fallback glass
-        state.bgImg = null;
+        bg.style.backgroundImage = `url("${url}")`;
         state.bgNaturalW = 0;
         state.bgNaturalH = 0;
 
-        bg.style.backgroundImage = `url("${url}")`;
         requestAnimationFrame(() => {
-          applySizing();
-          renderAllGlassTiles();
+          applySizingForLayout();
+          updateGlassAlignment();
         });
       };
       img.src = url;
@@ -1048,13 +1152,12 @@
       bg.style.backgroundImage = '';
       bgInput.value = '';
       state.bgUrl = null;
-      state.bgImg = null;
       state.bgNaturalW = 0;
       state.bgNaturalH = 0;
-      renderAllGlassTiles();
+      requestAnimationFrame(updateGlassAlignment);
     });
 
-    // ---------- Select
+    // --------- Gift selection
     giftSelect.addEventListener('change', () => {
       const v = giftSelect.value;
       if(v === ''){
@@ -1070,21 +1173,22 @@
       setSelectedGift(null);
     });
 
+    // --------- Toggle menu cadeau
     visibleGiftMenu.addEventListener('change', () => {
       document.body.classList.toggle('high-contrast-select', visibleGiftMenu.checked);
     });
 
-    // ---------- Controls
+    // --------- Controls
     layout.addEventListener('change', (e) => setLayout(e.target.value));
 
-    blurRange.addEventListener('input', () => {
-      state.blur = Number(blurRange.value);
+    blurRange.addEventListener('input', (e) => {
+      state.blur = Number(e.target.value);
       setCSSVars();
-      requestAnimationFrame(renderAllGlassTiles); // ✅ regen glace
+      requestAnimationFrame(updateGlassAlignment);
     });
 
-    roundRange.addEventListener('input', () => {
-      state.round = Number(roundRange.value);
+    roundRange.addEventListener('input', (e) => {
+      state.round = Number(e.target.value);
       setCSSVars();
     });
 
@@ -1092,15 +1196,14 @@
       state.cells = new Array(state.cols * state.rows).fill(null);
       state.labels = new Array(state.cols * state.rows).fill('');
       renderGrid();
-      requestAnimationFrame(renderAllGlassTiles);
     });
 
     window.addEventListener('resize', () => {
-      applySizing();
-      requestAnimationFrame(renderAllGlassTiles);
+      applySizingForLayout();
+      requestAnimationFrame(updateGlassAlignment);
     });
 
-    // ---------- Export PNG (stable)
+    // --------- Export PNG (✅ cache vraiment les aides + timing sûr)
     async function waitForImages(root){
       const imgs = Array.from(root.querySelectorAll('img'));
       await Promise.all(imgs.map(img => {
@@ -1121,13 +1224,14 @@
         exportBtn.disabled = true;
         exportBtn.textContent = "⏳ Export en cours...";
 
-        // cache les aides
+        // ✅ cache les aides d’édition
         document.body.classList.add('exporting');
 
-        // ✅ assure que la glace est bien à jour AVANT capture
+        // ✅ laisse 2 frames pour être sûr que html2canvas capture SANS pseudo-elements
         await nextFrame();
-        await renderAllGlassTiles();
         await nextFrame();
+
+        updateGlassAlignment();
         await waitForImages(stage);
 
         const canvas = await html2canvas(stage, {
@@ -1154,19 +1258,17 @@
       }
     });
 
-    // ---------- Init
+    // --------- Init
     renderGiftSelect();
 
     state.blur = Number(blurRange.value);
     state.round = Number(roundRange.value);
-
     setCSSVars();
-    setLayout(layout.value);
 
+    setLayout(layout.value);
     renderGiftPreview();
     renderGrid();
-    applySizing();
-    requestAnimationFrame(renderAllGlassTiles);
+    applySizingForLayout();
   </script>
 </body>
 </html>
