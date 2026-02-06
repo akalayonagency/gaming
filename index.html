@@ -279,9 +279,10 @@
       color: rgba(255,255,255,.88);
     }
 
+    /* ✅ STAGE = rectangle parfait */
     .stage{
       position:relative;
-      border-radius: 26px;
+      border-radius: 0px; /* ✅ plus arrondi */
       border: 1px solid rgba(255,60,90,.24);
       overflow:hidden;
       min-height: 560px;
@@ -289,12 +290,13 @@
       background: rgba(0,0,0,.25);
     }
 
+    /* ✅ IMPORTANT : plus de scale sinon l'effet glace se décale */
     .bg{
       position:absolute; inset:0;
       background-size: cover;
       background-position:center;
       filter: saturate(1.1) contrast(1.02);
-      transform: scale(1.02);
+      transform: none; /* ✅ */
     }
 
     .vignette{
@@ -330,7 +332,7 @@
       user-select:none;
     }
 
-    /* ✅ La case garde EXACTEMENT son style (physique inchangé) */
+    /* ✅ La case garde EXACTEMENT son style */
     .cell{
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -353,7 +355,10 @@
       background-repeat: no-repeat;
       transform: scale(1.08);
       filter: blur(var(--blur)) saturate(1.15);
-      opacity: .85;
+      opacity: .92;
+
+      /* ✅ fallback anti "carré vide" si bg pas prêt */
+      background-color: rgba(255,255,255,.08);
     }
 
     /* texture “verre” par-dessus */
@@ -434,7 +439,7 @@
       -webkit-text-stroke: 3px rgba(0,0,0,.92);
       paint-order: stroke fill;
 
-      /* 2 lignes max comme l'exemple */
+      /* 2 lignes max */
       min-height: var(--labelMinH);
       display:flex;
       align-items:flex-start;
@@ -444,6 +449,8 @@
       overflow:hidden;
       padding: 0 6px;
       word-break: break-word;
+
+      position: relative; /* ✅ pour les aides d'édition */
     }
 
     /* si label vide => on garde la place sans afficher */
@@ -451,6 +458,38 @@
       color: transparent;
       -webkit-text-stroke: 0px transparent;
       text-shadow: none;
+    }
+
+    /* ✅ AIDE D'ÉDITION : zone d'écriture visible à l'écran, invisible à l'export */
+    body:not(.exporting) .cellLabel::before{
+      content:"";
+      position:absolute;
+      inset: -8px -10px;
+      border-radius: 14px;
+      border: 2px dashed rgba(255,255,255,.45);
+      background: rgba(0,0,0,.28);
+      box-shadow: 0 10px 20px rgba(0,0,0,.35);
+      pointer-events:none;
+    }
+
+    body:not(.exporting) .cellLabel.is-empty::after{
+      content:"✍️ ÉCRIRE ICI";
+      position:absolute;
+      inset: 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 12px;
+      letter-spacing: .6px;
+      color: rgba(255,255,255,.70);
+      text-shadow: 0 2px 10px rgba(0,0,0,.55);
+      -webkit-text-stroke: 0;
+      pointer-events:none;
+    }
+
+    body.exporting .cellLabel::before,
+    body.exporting .cellLabel.is-empty::after{
+      display:none !important;
     }
   </style>
 </head>
@@ -758,10 +797,10 @@
       selectedGiftUrl: null,
       selectedGiftName: null,
 
-      // ✅ contenu des cases (image)
+      // contenu des cases (image)
       cells: [],
 
-      // ✅ texte sous les cases
+      // texte sous les cases
       labels: [],
 
       cols: 5,
@@ -917,7 +956,6 @@
 
       state.gap = 26;
 
-      // ✅ on conserve la logique mais on initialise aussi labels
       state.cells = new Array(c * r).fill(null);
       state.labels = new Array(c * r).fill('');
 
@@ -990,7 +1028,7 @@
       requestAnimationFrame(updateGlassAlignment);
     }
 
-    // --------- Grid render (✅ case + label dessous)
+    // --------- Grid render (case + label dessous)
     function renderGrid(){
       ensureArraysSize();
       grid.innerHTML = '';
@@ -1041,9 +1079,9 @@
           cell.appendChild(empty);
         }
 
-        // ✅ interactions existantes (inchangées)
+        // interactions
         cell.addEventListener('click', (e) => {
-          // Ctrl+clic (ou ⌘ Mac) => éditer le texte, sans placer de cadeau
+          // Ctrl+clic / ⌘ => éditer le texte
           if(e.ctrlKey || e.metaKey){
             editLabelAt(i);
             return;
@@ -1061,7 +1099,7 @@
           requestAnimationFrame(updateGlassAlignment);
         });
 
-        // ✅ clic droit = éditer le label (comme demandé)
+        // clic droit = éditer le label
         cell.addEventListener('contextmenu', (e) => {
           e.preventDefault();
           editLabelAt(i);
@@ -1079,7 +1117,7 @@
           label.textContent = txt;
         }
 
-        // Option : double-clic sur le label = éditer (pratique)
+        // double-clic sur le label = éditer
         label.addEventListener('dblclick', () => editLabelAt(i));
 
         tile.appendChild(cell);
@@ -1128,7 +1166,7 @@
       requestAnimationFrame(updateGlassAlignment);
     });
 
-    // --------- Gift selection (select trié par coins)
+    // --------- Gift selection
     giftSelect.addEventListener('change', () => {
       const v = giftSelect.value;
       if(v === ''){
@@ -1177,13 +1215,28 @@
       requestAnimationFrame(updateGlassAlignment);
     });
 
-    // --------- Export PNG (now stable)
+    // --------- Export PNG (aides invisibles)
+    async function waitForImages(root){
+      const imgs = Array.from(root.querySelectorAll('img'));
+      await Promise.all(imgs.map(img => {
+        if(img.complete && img.naturalWidth > 0) return Promise.resolve();
+        return new Promise(res => {
+          img.addEventListener('load', res, { once:true });
+          img.addEventListener('error', res, { once:true });
+        });
+      }));
+    }
+
     exportBtn.addEventListener('click', async () => {
       try{
         exportBtn.disabled = true;
         exportBtn.textContent = "⏳ Export en cours...";
 
+        // ✅ cache les aides d’édition (zone d'écriture)
+        document.body.classList.add('exporting');
+
         updateGlassAlignment();
+        await waitForImages(stage);
 
         const canvas = await html2canvas(stage, {
           backgroundColor: null,
@@ -1198,10 +1251,12 @@
         document.body.appendChild(a);
         a.click();
         a.remove();
+
       } catch(err){
         alert("Export impossible (vérifie que GitHub Pages sert bien les images).");
         console.error(err);
       } finally {
+        document.body.classList.remove('exporting');
         exportBtn.disabled = false;
         exportBtn.textContent = "Exporter en PNG";
       }
