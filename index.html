@@ -3,52 +3,36 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Créateur d'overlay By Akatsuki Orga.</title>
-
-  <!-- Export PNG -->
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <title>Créateur d'overlay — Akatsuki Orga</title>
 
   <style>
     :root{
       --bg: #07060a;
 
-      /* Akatsuki palette */
       --red: rgba(255, 60, 90, 1);
+      --red2: rgba(255, 100, 140, 1);
       --text: rgba(255,255,255,.92);
       --muted: rgba(255,255,255,.70);
 
-      /* Transparent menu */
-      --menu: rgba(0,0,0,.18);
-      --menu2: rgba(0,0,0,.10);
-
-      --strokeRed: rgba(255, 60, 90, .35);
+      --menu: rgba(0,0,0,.22);
+      --menu2: rgba(0,0,0,.12);
+      --strokeRed: rgba(255, 60, 90, .40);
 
       --shadow: 0 18px 40px rgba(0,0,0,.45);
-      --inner: inset 0 1px 0 rgba(255,255,255,.16), inset 0 -18px 40px rgba(0,0,0,.35);
       --r: 22px;
 
-      /* grid vars */
       --cols: 5;
       --rows: 3;
-      --blur: 16px;
       --gap: 26px;
-
-      /* ✅ taille calculée (TOUTES dispositions) */
       --cellSize: 150px;
-
-      /* label sizing */
-      --labelGap: 10px;
-      --labelMinH: 2.4em; /* ~2 lignes */
     }
 
     *{ box-sizing:border-box; }
-
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
       color: var(--text);
       min-height:100vh;
-
       background:
         radial-gradient(900px 500px at 70% 15%, rgba(255,60,90,.18), transparent 60%),
         radial-gradient(900px 500px at 20% 75%, rgba(255,255,255,.06), transparent 60%),
@@ -60,25 +44,18 @@
       grid-template-columns: 360px 1fr;
       gap: 18px;
       padding: 18px;
-      max-width: 1400px;
+      max-width: 1500px;
       margin: 0 auto;
     }
-    @media (max-width: 980px){
-      .app{ grid-template-columns: 1fr; }
-    }
+    @media (max-width: 980px){ .app{ grid-template-columns: 1fr; } }
 
-    /* MENU TRANSPARENT (glass) */
     .card{
       background: linear-gradient(180deg, var(--menu), var(--menu2));
       border: 1px solid var(--strokeRed);
       border-radius: 24px;
       box-shadow: var(--shadow);
       overflow:hidden;
-
-      backdrop-filter: blur(14px) saturate(1.15);
-      -webkit-backdrop-filter: blur(14px) saturate(1.15);
     }
-
     .sidebar{
       padding: 16px;
       position: sticky;
@@ -115,21 +92,18 @@
       padding-top: 14px;
       border-top: 1px solid rgba(255,255,255,.10);
     }
-
     label{
       display:block;
       font-size: 12px;
       color: var(--muted);
       margin-bottom: 8px;
     }
-
     .row{
       display:flex;
       gap: 10px;
       align-items:center;
       flex-wrap:wrap;
     }
-
     .btn{
       cursor:pointer;
       border: 1px solid rgba(255,255,255,.16);
@@ -137,16 +111,13 @@
       color: var(--text);
       padding: 10px 12px;
       border-radius: 14px;
-      font-weight: 800;
+      font-weight: 900;
       transition: transform .08s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
       text-decoration:none;
       display:inline-flex;
       align-items:center;
       gap: 8px;
       user-select:none;
-
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
     }
     .btn:hover{
       background: rgba(0,0,0,.28);
@@ -156,12 +127,10 @@
     .btn:active{ transform: translateY(1px); }
 
     .btn.primary{
-      background: linear-gradient(180deg, rgba(255,60,90,.20), rgba(255,60,90,.10));
+      background: linear-gradient(180deg, rgba(255,60,90,.22), rgba(255,60,90,.10));
       border-color: rgba(255,60,90,.38);
       box-shadow: 0 0 0 3px rgba(255,60,90,.10);
     }
-    .btn.primary:hover{ box-shadow: 0 0 0 3px rgba(255,60,90,.16); }
-
     .btn.danger{
       background: rgba(255,60,90,.12);
       border-color: rgba(255,60,90,.30);
@@ -186,22 +155,7 @@
       color: var(--text);
       outline:none;
       box-shadow: 0 0 0 3px rgba(255,60,90,.08);
-    }
-
-    /* ✅ Mode "menu cadeau plus visible" (toggle) */
-    body.high-contrast-select select{
-      background: rgba(0,0,0,.55);
-      border-color: rgba(255,60,90,.65);
-      box-shadow:
-        0 0 0 3px rgba(255,60,90,.20),
-        0 10px 24px rgba(0,0,0,.35);
-      font-weight: 900;
-    }
-    body.high-contrast-select select:focus{
-      outline: none;
-      box-shadow:
-        0 0 0 4px rgba(255,60,90,.28),
-        0 12px 30px rgba(0,0,0,.45);
+      font-weight: 800;
     }
 
     .hint{
@@ -209,6 +163,15 @@
       color: rgba(255,255,255,.72);
       line-height: 1.35;
       margin-top: 8px;
+    }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New";
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,60,90,.30);
+      background: rgba(255,60,90,.10);
+      color: rgba(255,255,255,.88);
     }
 
     .giftPreview{
@@ -240,7 +203,7 @@
       filter: drop-shadow(0 12px 14px rgba(0,0,0,.45));
     }
     .giftPreview .meta{ display:flex; flex-direction:column; gap: 2px; }
-    .giftPreview .meta .name{ font-weight: 900; font-size: 13px; }
+    .giftPreview .meta .name{ font-weight: 950; font-size: 13px; }
     .giftPreview .meta .sub{ font-size: 12px; color: rgba(255,255,255,.70); }
 
     .main{
@@ -250,7 +213,6 @@
       gap: 14px;
       min-height: calc(100vh - 36px);
     }
-
     .stage-wrap{ display:flex; flex-direction:column; gap: 10px; }
     .stage-toolbar{
       display:flex;
@@ -259,61 +221,57 @@
       gap: 10px;
       flex-wrap:wrap;
     }
-
     .footer-note{
       font-size: 12px;
       color: rgba(255,255,255,.75);
       opacity:.98;
     }
 
-    .kbd{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New";
-      font-size: 11px;
-      padding: 2px 6px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,60,90,.30);
-      background: rgba(255,60,90,.10);
-      color: rgba(255,255,255,.88);
-    }
-
-    /* ✅ STAGE = rectangle parfait */
     .stage{
       position:relative;
       border-radius: 0px;
       border: 1px solid rgba(255,60,90,.24);
       overflow:hidden;
-      min-height: 560px;
       box-shadow: var(--shadow);
       background: rgba(0,0,0,.25);
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      min-height: 360px;
     }
 
-    /* ✅ IMPORTANT : pas de scale ici sinon l'align glace se décale */
-    .bg{
+    .bgLayer{
       position:absolute; inset:0;
-      background-size: cover;
-      background-position:center;
-      filter: saturate(1.1) contrast(1.02);
-      transform: none;
+      overflow:hidden;
+    }
+    .bgLayer img,
+    .bgLayer video{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      filter: saturate(1.06) contrast(1.03);
     }
 
     .vignette{
       position:absolute; inset:0;
-      background: radial-gradient(1200px 700px at 50% 35%, transparent 40%, rgba(0,0,0,.40) 100%);
+      background:
+        radial-gradient(1200px 700px at 50% 35%, transparent 48%, rgba(0,0,0,.45) 100%),
+        linear-gradient(180deg, rgba(0,0,0,.14), rgba(0,0,0,.08));
       pointer-events:none;
     }
 
-    /* ✅ GRID : taille FIXE pilotée par --cellSize (plus de “trop grand”) */
+    /* ✅ GRID */
     .grid{
-      position:absolute; inset: 40px;
+      position:absolute;
+      inset: 40px;
       display:grid;
-      gap: var(--gap);
       align-content:center;
       justify-content:center;
+      gap: var(--gap);
       grid-template-columns: repeat(var(--cols), var(--cellSize));
     }
-    @media (max-width: 980px){
-      .grid{ inset: 18px; }
-    }
+    @media (max-width: 980px){ .grid{ inset: 18px; } }
 
     .tile{
       width: var(--cellSize);
@@ -321,10 +279,11 @@
       flex-direction:column;
       align-items:center;
       justify-content:flex-start;
-      gap: var(--labelGap);
+      gap: 10px;
       user-select:none;
     }
 
+    /* ✅ NEON PANEL (pas de blur CSS) */
     .cell{
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -333,54 +292,67 @@
       overflow:hidden;
       cursor:pointer;
 
-      border: 1px solid rgba(255,255,255,.18);
-      box-shadow: 0 14px 30px rgba(0,0,0,.42), var(--inner);
-      background: rgba(255,255,255,.10);
+      background:
+        linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.28));
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow:
+        0 18px 34px rgba(0,0,0,.45),
+        0 0 0 1px rgba(255,60,90,.10) inset;
     }
 
-    /* ✅ “glace” plus stable (et pas de carré vide) */
-    .cell .glass-bg{
-      position:absolute;
-      inset: -22px;
-      background-repeat: no-repeat;
-      background-color: rgba(255,255,255,.07);
-      transform: none;
-      filter: blur(var(--blur)) saturate(1.18) contrast(1.03);
+    /* Halo / glow */
+    .cell::before{
+      content:"";
+      position:absolute; inset:-18px;
+      background: radial-gradient(120px 120px at 30% 25%, rgba(255,60,90,.18), transparent 65%),
+                  radial-gradient(120px 120px at 70% 75%, rgba(255,255,255,.10), transparent 60%);
       opacity: .95;
-      will-change: background-position, background-size, filter;
-    }
-
-    /* texture “verre” par-dessus */
-    .cell .glass-tint{
-      position:absolute;
-      inset:0;
-      border-radius: var(--r);
-      background:
-        linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.06)),
-        radial-gradient(240px 240px at 18% 12%, rgba(255,255,255,.20), transparent 58%);
       pointer-events:none;
+      filter: blur(2px);
     }
 
-    .cell .glass-shine{
-      position:absolute;
-      inset:-2px;
+    /* Motif diagonal très léger */
+    .cell::after{
+      content:"";
+      position:absolute; inset:0;
       background:
-        radial-gradient(220px 220px at 15% 10%, rgba(255,255,255,.28), transparent 55%),
-        linear-gradient(135deg, rgba(255,255,255,.18), transparent 40%);
-      opacity: .55;
+        repeating-linear-gradient(135deg,
+          rgba(255,255,255,.06) 0px,
+          rgba(255,255,255,.06) 4px,
+          rgba(255,255,255,0) 4px,
+          rgba(255,255,255,0) 14px);
+      opacity: .35;
       pointer-events:none;
+      mix-blend-mode: overlay;
     }
 
-    .cell .glass-edge{
+    /* Cadre néon via un overlay interne */
+    .neonFrame{
       position:absolute; inset:0;
       border-radius: var(--r);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.22);
+      pointer-events:none;
+      box-shadow:
+        inset 0 0 0 2px rgba(255,60,90,.28),
+        inset 0 0 0 1px rgba(255,255,255,.12),
+        0 0 18px rgba(255,60,90,.12);
+    }
+
+    /* Petite lumière en haut */
+    .topShine{
+      position:absolute; left:-20%; top:-40%;
+      width: 140%;
+      height: 70%;
+      background: radial-gradient(closest-side, rgba(255,255,255,.16), transparent 72%);
+      transform: rotate(6deg);
+      opacity: .65;
       pointer-events:none;
     }
 
     .cell:hover{
-      border-color: rgba(255,60,90,.35);
-      box-shadow: 0 14px 30px rgba(0,0,0,.42), var(--inner), 0 0 0 3px rgba(255,60,90,.10);
+      border-color: rgba(255,60,90,.28);
+      box-shadow:
+        0 18px 34px rgba(0,0,0,.45),
+        0 0 0 3px rgba(255,60,90,.10);
     }
 
     .cell .giftInCell{
@@ -389,13 +361,13 @@
       align-items:center;
       justify-content:center;
       pointer-events:none;
+      z-index: 3;
     }
     .cell .giftInCell img{
       width: 100%;
       height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 16px 18px rgba(0,0,0,.50));
-      image-rendering: auto;
+      filter: drop-shadow(0 18px 18px rgba(0,0,0,.55));
     }
 
     .cell .empty{
@@ -404,13 +376,15 @@
       align-items:center;
       justify-content:center;
       font-size: 12px;
-      color: rgba(255,255,255,.58);
+      color: rgba(255,255,255,.65);
       pointer-events:none;
       text-align:center;
       padding: 10px;
+      text-shadow: 0 6px 18px rgba(0,0,0,.65);
+      z-index: 3;
     }
 
-    /* ✅ Label overlay */
+    /* Label */
     .cellLabel{
       width: 100%;
       text-align:center;
@@ -428,18 +402,15 @@
       -webkit-text-stroke: 3px rgba(0,0,0,.92);
       paint-order: stroke fill;
 
-      min-height: var(--labelMinH);
+      min-height: 2.4em;
       display:flex;
       align-items:flex-start;
       justify-content:center;
 
-      overflow:hidden;
       padding: 0 6px;
       word-break: break-word;
-
       position: relative;
     }
-
     .cellLabel.is-empty{
       color: transparent;
       -webkit-text-stroke: 0px transparent;
@@ -471,10 +442,6 @@
       -webkit-text-stroke: 0;
       pointer-events:none;
     }
-    body.exporting .cellLabel::before,
-    body.exporting .cellLabel.is-empty::after{
-      display:none !important;
-    }
   </style>
 </head>
 
@@ -483,32 +450,37 @@
     <!-- SIDEBAR -->
     <div class="card sidebar">
       <div class="title">
-        <h1>Créateur d'overlay By Akatsuki Orga.</h1>
+        <h1>Créateur d'overlay — Akatsuki Orga.</h1>
         <div class="badge">☁️🩸 Akatsuki</div>
       </div>
 
       <div class="section">
-        <label>🖼️ 1) Image de fond</label>
-        <input id="bgInput" type="file" accept="image/*" />
-        <div class="row" style="margin-top:10px;">
-          <a class="btn primary" href="https://chatgpt.com" target="_blank" rel="noopener">
-            ✨ Créer mon fond sur chatgpt.com
-          </a>
-          <button class="btn" id="clearBg">Retirer le fond</button>
+        <label>🖼️ 1) Fond (image ou vidéo)</label>
+        <div class="row" style="width:100%">
+          <div style="flex:1; min-width:160px;">
+            <label style="margin-bottom:6px;">Image</label>
+            <input id="bgImageInput" type="file" accept="image/*" />
+          </div>
+          <div style="flex:1; min-width:160px;">
+            <label style="margin-bottom:6px;">Vidéo</label>
+            <input id="bgVideoInput" type="file" accept="video/*" />
+          </div>
         </div>
-        <div class="hint">☁️🩸 Conseil : 1920×1080 (ou +) pour un rendu net.</div>
+
+        <div class="row" style="margin-top:10px;">
+          <button class="btn" id="clearBg">Retirer le fond</button>
+          <button class="btn" id="toggleVideo">⏯️ Vidéo</button>
+          <button class="btn" id="muteVideo">🔇</button>
+        </div>
+
+        <div class="hint">
+          ✅ Vidéo OK (overlay dynamique). Export PNG = capture de la frame actuelle.
+        </div>
       </div>
 
       <div class="section">
         <label>🎁 2) Choisir un cadeau</label>
         <select id="giftSelect"></select>
-
-        <div class="row" style="margin-top:10px;">
-          <label style="display:flex;align-items:center;gap:10px;margin:0;color:rgba(255,255,255,.82);">
-            <input type="checkbox" id="visibleGiftMenu" />
-            🔆 Menu cadeau plus visible
-          </label>
-        </div>
 
         <div class="giftPreview">
           <div class="thumb" id="giftThumb"></div>
@@ -521,51 +493,51 @@
         <div class="row" style="margin-top:10px;">
           <button class="btn" id="deselect">Désélectionner</button>
         </div>
-
-        <div class="hint">
-          ✅ PNG en racine (même dossier que <b>index.html</b>) : <span class="kbd">./rose.png</span> etc.
-        </div>
       </div>
 
       <div class="section">
-        <label>🧊 3) Réglages des cases “verre”</label>
+        <label>⚙️ 3) Réglages</label>
 
-        <div class="row" style="width:100%;">
-          <div style="flex:1; min-width: 150px;">
-            <label style="margin-bottom:6px;">Disposition</label>
-            <select id="layout">
-              <option value="3x2">3 colonnes × 2 lignes (6)</option>
-              <option value="5x2">5 colonnes × 2 lignes (10)</option>
-              <option value="5x3" selected>5 colonnes × 3 lignes (15)</option>
-              <option value="6x3">6 colonnes × 3 lignes (18)</option>
-            </select>
-          </div>
-        </div>
-
-        <div style="margin-top:12px;">
-          <label>🌫️ Flou : <span id="blurVal">16</span>px</label>
-          <input id="blur" type="range" min="0" max="30" value="16" />
-        </div>
+        <label style="margin-top:8px;">Disposition</label>
+        <select id="layout">
+          <option value="3x2">3 × 2 (6)</option>
+          <option value="5x2">5 × 2 (10)</option>
+          <option value="5x3" selected>5 × 3 (15)</option>
+          <option value="6x3">6 × 3 (18)</option>
+        </select>
 
         <div style="margin-top:12px;">
           <label>⭕ Arrondi : <span id="roundVal">22</span>px</label>
           <input id="round" type="range" min="8" max="40" value="22" />
         </div>
 
+        <div style="margin-top:12px;">
+          <label>↔️ Gap : <span id="gapVal">26</span>px</label>
+          <input id="gap" type="range" min="12" max="40" value="26" />
+        </div>
+
         <div class="hint">
-          🩸 Choisis un cadeau → clique une case.<br/>
-          ✍️ Pour écrire sous une case : <span class="kbd">clic droit</span> sur la case (ou <span class="kbd">Ctrl</span>+clic).
+          ✍️ Texte : <span class="kbd">clic droit</span> (ou <span class="kbd">Ctrl</span>+clic) sur une case.
         </div>
       </div>
 
       <div class="section">
-        <label>🧹 4) Actions</label>
-        <div class="row">
+        <label>🖨️ 4) Export</label>
+
+        <label style="margin-top:8px;">Résolution</label>
+        <select id="exportRes">
+          <option value="1920x1080" selected>1920×1080 (1080p)</option>
+          <option value="2560x1440">2560×1440 (1440p)</option>
+          <option value="3840x2160">3840×2160 (4K)</option>
+        </select>
+
+        <div class="row" style="margin-top:10px;">
           <button class="btn danger" id="resetGrid">Vider toutes les cases</button>
           <button class="btn primary" id="exportPng">Exporter en PNG</button>
         </div>
+
         <div class="hint">
-          ✅ Export fidèle : l’aide “ÉCRIRE ICI” ne sort pas sur le PNG.
+          ✅ Export propre (canvas renderer). Aucun html2canvas. Aucun bug de filtre.
         </div>
       </div>
     </div>
@@ -575,13 +547,17 @@
       <div class="stage-wrap">
         <div class="stage-toolbar">
           <div class="footer-note">
-            ☁️🩸 Cadeau : clique une case • <span class="kbd">Double-clic</span> pour supprimer •
+            ☁️🩸 Cadeau : clique une case • <span class="kbd">Double-clic</span> supprime •
             ✍️ Texte : <span class="kbd">clic droit</span> (ou <span class="kbd">Ctrl</span>+clic)
           </div>
         </div>
 
         <div class="stage" id="stage">
-          <div class="bg" id="bg"></div>
+          <div class="bgLayer">
+            <img id="bgImg" alt="" style="display:none;">
+            <video id="bgVid" style="display:none;" playsinline loop></video>
+          </div>
+
           <div class="vignette"></div>
           <div class="grid" id="grid"></div>
         </div>
@@ -590,10 +566,7 @@
   </div>
 
   <script>
-    /**
-     * ✅ Tes fichiers en RACINE (même niveau que index.html)
-     * (Liste complète conservée)
-     */
+    // ✅ LISTE COMPLÈTE (celle de ton message)
     const GIFTS = [
       { name: "9 queues 🪙 1800", file: "9 queues.png" },
       { name: "2026 🪙 1", file: "2026.png" },
@@ -780,56 +753,54 @@
     const state = {
       selectedGiftUrl: null,
       selectedGiftName: null,
-
       cells: [],
       labels: [],
-
       cols: 5,
       rows: 3,
-      blur: 16,
       round: 22,
       gap: 26,
 
-      bgUrl: null,
-      bgNaturalW: 0,
-      bgNaturalH: 0
+      bgType: "none", // none | image | video
+      bgImage: null,
+      bgVideo: null,
     };
 
     // Elements
-    const stage = document.getElementById('stage');
-    const bg = document.getElementById('bg');
-    const grid = document.getElementById('grid');
+    const stage = document.getElementById("stage");
+    const grid = document.getElementById("grid");
 
-    const bgInput = document.getElementById('bgInput');
-    const clearBgBtn = document.getElementById('clearBg');
+    const bgImageInput = document.getElementById("bgImageInput");
+    const bgVideoInput = document.getElementById("bgVideoInput");
+    const clearBgBtn = document.getElementById("clearBg");
+    const toggleVideoBtn = document.getElementById("toggleVideo");
+    const muteVideoBtn = document.getElementById("muteVideo");
 
-    const giftSelect = document.getElementById('giftSelect');
-    const giftThumb = document.getElementById('giftThumb');
-    const giftName = document.getElementById('giftName');
-    const deselectBtn = document.getElementById('deselect');
+    const bgImgEl = document.getElementById("bgImg");
+    const bgVidEl = document.getElementById("bgVid");
 
-    const visibleGiftMenu = document.getElementById('visibleGiftMenu');
+    const giftSelect = document.getElementById("giftSelect");
+    const giftThumb = document.getElementById("giftThumb");
+    const giftName = document.getElementById("giftName");
+    const deselectBtn = document.getElementById("deselect");
 
-    const layout = document.getElementById('layout');
+    const layout = document.getElementById("layout");
+    const roundRange = document.getElementById("round");
+    const roundVal = document.getElementById("roundVal");
+    const gapRange = document.getElementById("gap");
+    const gapVal = document.getElementById("gapVal");
 
-    const blurRange = document.getElementById('blur');
-    const blurVal = document.getElementById('blurVal');
+    const resetGridBtn = document.getElementById("resetGrid");
+    const exportBtn = document.getElementById("exportPng");
+    const exportRes = document.getElementById("exportRes");
 
-    const roundRange = document.getElementById('round');
-    const roundVal = document.getElementById('roundVal');
-
-    const resetGridBtn = document.getElementById('resetGrid');
-    const exportBtn = document.getElementById('exportPng');
-
+    // -------------------------
     function setCSSVars(){
-      document.documentElement.style.setProperty('--cols', state.cols);
-      document.documentElement.style.setProperty('--rows', state.rows);
-      document.documentElement.style.setProperty('--blur', state.blur + 'px');
-      document.documentElement.style.setProperty('--r', state.round + 'px');
-      document.documentElement.style.setProperty('--gap', state.gap + 'px');
-
-      blurVal.textContent = state.blur;
+      document.documentElement.style.setProperty("--cols", state.cols);
+      document.documentElement.style.setProperty("--rows", state.rows);
+      document.documentElement.style.setProperty("--r", state.round + "px");
+      document.documentElement.style.setProperty("--gap", state.gap + "px");
       roundVal.textContent = state.round;
+      gapVal.textContent = state.gap;
     }
 
     function parseCoinsFromName(name){
@@ -840,21 +811,21 @@
     function getSortedGiftIndexes(){
       return GIFTS
         .map((g, idx) => ({ idx, coins: parseCoinsFromName(g.name), name: g.name }))
-        .sort((a, b) => (a.coins - b.coins) || a.name.localeCompare(b.name, 'fr'))
+        .sort((a, b) => (a.coins - b.coins) || a.name.localeCompare(b.name, "fr"))
         .map(x => x.idx);
     }
 
     function renderGiftSelect(){
-      giftSelect.innerHTML = '';
-      const opt0 = document.createElement('option');
-      opt0.value = '';
-      opt0.textContent = '— Aucun (désélectionné) —';
+      giftSelect.innerHTML = "";
+      const opt0 = document.createElement("option");
+      opt0.value = "";
+      opt0.textContent = "— Aucun (désélectionné) —";
       giftSelect.appendChild(opt0);
 
       const sortedIdx = getSortedGiftIndexes();
       sortedIdx.forEach((idx) => {
         const g = GIFTS[idx];
-        const opt = document.createElement('option');
+        const opt = document.createElement("option");
         opt.value = String(idx);
         opt.textContent = `🎁 ${g.name}`;
         giftSelect.appendChild(opt);
@@ -862,13 +833,13 @@
     }
 
     function renderGiftPreview(){
-      giftThumb.innerHTML = '';
+      giftThumb.innerHTML = "";
       if(!state.selectedGiftUrl){
         giftName.textContent = "Aucun cadeau sélectionné";
         return;
       }
       giftName.textContent = state.selectedGiftName || "Cadeau";
-      const img = document.createElement('img');
+      const img = document.createElement("img");
       img.src = state.selectedGiftUrl;
       img.alt = state.selectedGiftName || "cadeau";
       giftThumb.appendChild(img);
@@ -902,15 +873,11 @@
 
       if(state.labels.length !== total){
         const oldL = state.labels.slice();
-        state.labels = new Array(total).fill('');
-        for(let i=0; i<Math.min(oldL.length, total); i++) state.labels[i] = oldL[i] || '';
+        state.labels = new Array(total).fill("");
+        for(let i=0; i<Math.min(oldL.length, total); i++) state.labels[i] = oldL[i] || "";
       }
     }
 
-    /**
-     * ✅ IMPORTANT : calcule une taille de case qui rentre TOUJOURS,
-     * donc 5x3 ne sera plus “trop grand”.
-     */
     function applySizingForLayout(){
       const inset = (window.innerWidth <= 980) ? 18 : 40;
 
@@ -920,155 +887,86 @@
       const availW = Math.max(200, stageW - inset * 2);
       const availH = Math.max(200, stageH - inset * 2);
 
-      // place prise par le label sous chaque case (approx)
-      const labelSpace = 56; // px (label + marge)
+      const labelSpace = 56;
       const rows = state.rows;
       const cols = state.cols;
 
-      // base gap puis recalcul
-      let gap = 26;
+      let gap = state.gap;
 
-      // itération simple : calcule cell avec un gap provisoire
       const cellW = Math.floor((availW - (cols - 1) * gap) / cols);
       const cellH = Math.floor((availH - (rows - 1) * gap) / rows - labelSpace);
 
       let cell = Math.min(cellW, cellH);
 
-      // clamps
       const minCell = (window.innerWidth <= 980) ? 92 : 110;
-      const maxCell = 190;
+      const maxCell = 210;
       cell = Math.max(minCell, Math.min(maxCell, cell));
 
-      // gap dépend de la taille (plus joli)
-      gap = Math.round(Math.max(14, Math.min(34, cell * 0.14)));
-
-      document.documentElement.style.setProperty('--cellSize', cell + 'px');
-      state.gap = gap;
-
-      setCSSVars();
-      requestAnimationFrame(updateGlassAlignment);
+      document.documentElement.style.setProperty("--cellSize", cell + "px");
     }
 
     function setLayout(value){
-      const [c, r] = value.split('x').map(Number);
+      const [c, r] = value.split("x").map(Number);
       state.cols = c;
       state.rows = r;
 
       state.cells = new Array(c * r).fill(null);
-      state.labels = new Array(c * r).fill('');
+      state.labels = new Array(c * r).fill("");
 
+      setCSSVars();
       applySizingForLayout();
       renderGrid();
     }
 
-    // --------- Faux blur alignment
-    function computeCoverParams(){
-      if(!state.bgUrl || !state.bgNaturalW || !state.bgNaturalH) return null;
-
-      const stageW = stage.clientWidth;
-      const stageH = stage.clientHeight;
-
-      const s = Math.max(stageW / state.bgNaturalW, stageH / state.bgNaturalH);
-      const drawnW = state.bgNaturalW * s;
-      const drawnH = state.bgNaturalH * s;
-
-      const offsetX = (stageW - drawnW) / 2;
-      const offsetY = (stageH - drawnH) / 2;
-
-      return { drawnW, drawnH, offsetX, offsetY };
-    }
-
-    function updateGlassAlignment(){
-      const params = computeCoverParams();
-      const cells = grid.querySelectorAll('.cell');
-
-      if(!params){
-        cells.forEach(cell => {
-          const gb = cell.querySelector('.glass-bg');
-          if(!gb) return;
-          gb.style.backgroundImage = '';
-          gb.style.background = 'linear-gradient(135deg, rgba(255,255,255,.10), rgba(255,255,255,.04))';
-        });
-        return;
-      }
-
-      const stageRect = stage.getBoundingClientRect();
-
-      cells.forEach(cell => {
-        const gb = cell.querySelector('.glass-bg');
-        if(!gb) return;
-
-        const rect = cell.getBoundingClientRect();
-        const left = rect.left - stageRect.left;
-        const top  = rect.top  - stageRect.top;
-
-        gb.style.background = 'none';
-        gb.style.backgroundImage = `url("${state.bgUrl}")`;
-        gb.style.backgroundSize = `${params.drawnW}px ${params.drawnH}px`;
-        gb.style.backgroundPosition = `${params.offsetX - left}px ${params.offsetY - top}px`;
-      });
-    }
-
     function editLabelAt(index){
-      const current = (state.labels[index] || '').toString();
+      const current = (state.labels[index] || "").toString();
       const next = prompt("Texte sous la case (vide = supprimer) :", current);
       if(next === null) return;
-      state.labels[index] = (next || '').trim();
+      state.labels[index] = (next || "").trim();
       renderGrid();
-      requestAnimationFrame(updateGlassAlignment);
     }
 
     function renderGrid(){
       ensureArraysSize();
-      grid.innerHTML = '';
+      grid.innerHTML = "";
 
       const total = state.cols * state.rows;
 
       for(let i=0; i<total; i++){
-        const tile = document.createElement('div');
-        tile.className = 'tile';
+        const tile = document.createElement("div");
+        tile.className = "tile";
 
-        const cell = document.createElement('div');
-        cell.className = 'cell';
+        const cell = document.createElement("div");
+        cell.className = "cell";
 
-        // glass layers
-        const glassBg = document.createElement('div');
-        glassBg.className = 'glass-bg';
-
-        const glassTint = document.createElement('div');
-        glassTint.className = 'glass-tint';
-
-        const glassShine = document.createElement('div');
-        glassShine.className = 'glass-shine';
-
-        const glassEdge = document.createElement('div');
-        glassEdge.className = 'glass-edge';
-
-        cell.appendChild(glassBg);
-        cell.appendChild(glassTint);
-        cell.appendChild(glassShine);
-        cell.appendChild(glassEdge);
+        // deco overlays (neon + shine)
+        const shine = document.createElement("div");
+        shine.className = "topShine";
+        const frame = document.createElement("div");
+        frame.className = "neonFrame";
+        cell.appendChild(shine);
+        cell.appendChild(frame);
 
         const url = state.cells[i];
 
         if(url){
-          const wrap = document.createElement('div');
-          wrap.className = 'giftInCell';
+          const wrap = document.createElement("div");
+          wrap.className = "giftInCell";
 
-          const img = document.createElement('img');
+          const img = document.createElement("img");
           img.src = url;
-          img.alt = 'gift';
+          img.alt = "gift";
 
           wrap.appendChild(img);
           cell.appendChild(wrap);
         } else {
-          const empty = document.createElement('div');
-          empty.className = 'empty';
-          empty.textContent = state.selectedGiftUrl ? 'Clique pour placer ☁️' : 'Choisis un cadeau 🩸';
+          const empty = document.createElement("div");
+          empty.className = "empty";
+          empty.textContent = state.selectedGiftUrl ? "Clique pour placer ☁️" : "Choisis un cadeau 🩸";
           cell.appendChild(empty);
         }
 
-        cell.addEventListener('click', (e) => {
+        cell.addEventListener("click", (e) => {
           if(e.ctrlKey || e.metaKey){
             editLabelAt(i);
             return;
@@ -1076,91 +974,108 @@
           if(!state.selectedGiftUrl) return;
           state.cells[i] = state.selectedGiftUrl;
           renderGrid();
-          requestAnimationFrame(updateGlassAlignment);
         });
 
-        cell.addEventListener('dblclick', () => {
+        cell.addEventListener("dblclick", () => {
           state.cells[i] = null;
           renderGrid();
-          requestAnimationFrame(updateGlassAlignment);
         });
 
-        cell.addEventListener('contextmenu', (e) => {
+        cell.addEventListener("contextmenu", (e) => {
           e.preventDefault();
           editLabelAt(i);
         });
 
-        const label = document.createElement('div');
-        label.className = 'cellLabel';
-        const txt = (state.labels[i] || '').trim();
+        const label = document.createElement("div");
+        label.className = "cellLabel";
+        const txt = (state.labels[i] || "").trim();
 
         if(!txt){
-          label.classList.add('is-empty');
-          label.textContent = '—';
+          label.classList.add("is-empty");
+          label.textContent = "—";
         } else {
           label.textContent = txt;
         }
 
-        label.addEventListener('dblclick', () => editLabelAt(i));
+        label.addEventListener("dblclick", () => editLabelAt(i));
 
         tile.appendChild(cell);
         tile.appendChild(label);
         grid.appendChild(tile);
       }
-
-      requestAnimationFrame(updateGlassAlignment);
     }
 
-    // --------- Background upload
-    async function setBackgroundFromUrl(url){
-      state.bgUrl = url;
-
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        state.bgNaturalW = img.naturalWidth;
-        state.bgNaturalH = img.naturalHeight;
-
-        bg.style.backgroundImage = `url("${url}")`;
-
-        requestAnimationFrame(() => {
-          applySizingForLayout();
-          updateGlassAlignment();
-        });
-      };
-      img.onerror = () => {
-        bg.style.backgroundImage = `url("${url}")`;
-        state.bgNaturalW = 0;
-        state.bgNaturalH = 0;
-
-        requestAnimationFrame(() => {
-          applySizingForLayout();
-          updateGlassAlignment();
-        });
-      };
-      img.src = url;
+    // -------------------------
+    // Background: image / video
+    function clearBackground(){
+      state.bgType = "none";
+      bgImgEl.style.display = "none";
+      bgVidEl.style.display = "none";
+      bgImgEl.src = "";
+      bgVidEl.src = "";
+      bgImageInput.value = "";
+      bgVideoInput.value = "";
+      state.bgImage = null;
+      state.bgVideo = null;
     }
 
-    bgInput.addEventListener('change', (e) => {
+    function setBackgroundImage(file){
+      const url = URL.createObjectURL(file);
+      state.bgType = "image";
+      bgVidEl.pause();
+      bgVidEl.style.display = "none";
+      bgImgEl.style.display = "block";
+      bgImgEl.onload = () => {
+        state.bgImage = bgImgEl;
+      };
+      bgImgEl.src = url;
+    }
+
+    function setBackgroundVideo(file){
+      const url = URL.createObjectURL(file);
+      state.bgType = "video";
+      bgImgEl.style.display = "none";
+      bgVidEl.style.display = "block";
+      bgVidEl.muted = true;
+      bgVidEl.loop = true;
+      bgVidEl.onloadeddata = () => {
+        state.bgVideo = bgVidEl;
+        bgVidEl.play().catch(()=>{});
+      };
+      bgVidEl.src = url;
+    }
+
+    bgImageInput.addEventListener("change", (e) => {
       const file = e.target.files?.[0];
       if(!file) return;
-      const url = URL.createObjectURL(file);
-      setBackgroundFromUrl(url);
+      setBackgroundImage(file);
     });
 
-    clearBgBtn.addEventListener('click', () => {
-      bg.style.backgroundImage = '';
-      bgInput.value = '';
-      state.bgUrl = null;
-      state.bgNaturalW = 0;
-      state.bgNaturalH = 0;
-      requestAnimationFrame(updateGlassAlignment);
+    bgVideoInput.addEventListener("change", (e) => {
+      const file = e.target.files?.[0];
+      if(!file) return;
+      setBackgroundVideo(file);
     });
 
-    // --------- Gift selection
-    giftSelect.addEventListener('change', () => {
+    clearBgBtn.addEventListener("click", clearBackground);
+
+    toggleVideoBtn.addEventListener("click", () => {
+      if(state.bgType !== "video") return;
+      if(bgVidEl.paused) bgVidEl.play().catch(()=>{});
+      else bgVidEl.pause();
+    });
+
+    muteVideoBtn.addEventListener("click", () => {
+      if(state.bgType !== "video") return;
+      bgVidEl.muted = !bgVidEl.muted;
+      muteVideoBtn.textContent = bgVidEl.muted ? "🔇" : "🔊";
+    });
+
+    // -------------------------
+    // Gift selection
+    giftSelect.addEventListener("change", () => {
       const v = giftSelect.value;
-      if(v === ''){
+      if(v === ""){
         setSelectedGift(null);
         return;
       }
@@ -1168,80 +1083,266 @@
       setSelectedGift(GIFTS[idx]);
     });
 
-    deselectBtn.addEventListener('click', () => {
-      giftSelect.value = '';
+    deselectBtn.addEventListener("click", () => {
+      giftSelect.value = "";
       setSelectedGift(null);
     });
 
-    // --------- Toggle menu cadeau
-    visibleGiftMenu.addEventListener('change', () => {
-      document.body.classList.toggle('high-contrast-select', visibleGiftMenu.checked);
-    });
+    // -------------------------
+    // Controls
+    layout.addEventListener("change", (e) => setLayout(e.target.value));
 
-    // --------- Controls
-    layout.addEventListener('change', (e) => setLayout(e.target.value));
-
-    blurRange.addEventListener('input', (e) => {
-      state.blur = Number(e.target.value);
-      setCSSVars();
-      requestAnimationFrame(updateGlassAlignment);
-    });
-
-    roundRange.addEventListener('input', (e) => {
+    roundRange.addEventListener("input", (e) => {
       state.round = Number(e.target.value);
       setCSSVars();
     });
 
-    resetGridBtn.addEventListener('click', () => {
+    gapRange.addEventListener("input", (e) => {
+      state.gap = Number(e.target.value);
+      setCSSVars();
+      applySizingForLayout();
+    });
+
+    resetGridBtn.addEventListener("click", () => {
       state.cells = new Array(state.cols * state.rows).fill(null);
-      state.labels = new Array(state.cols * state.rows).fill('');
+      state.labels = new Array(state.cols * state.rows).fill("");
       renderGrid();
     });
 
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       applySizingForLayout();
-      requestAnimationFrame(updateGlassAlignment);
     });
 
-    // --------- Export PNG (✅ cache vraiment les aides + timing sûr)
-    async function waitForImages(root){
-      const imgs = Array.from(root.querySelectorAll('img'));
-      await Promise.all(imgs.map(img => {
-        if(img.complete && img.naturalWidth > 0) return Promise.resolve();
-        return new Promise(res => {
-          img.addEventListener('load', res, { once:true });
-          img.addEventListener('error', res, { once:true });
-        });
-      }));
+    // -------------------------
+    // Export PNG via Canvas renderer (propre, fidèle)
+    function roundRectPath(ctx, x, y, w, h, r){
+      const rr = Math.min(r, w/2, h/2);
+      ctx.beginPath();
+      ctx.moveTo(x+rr, y);
+      ctx.arcTo(x+w, y, x+w, y+h, rr);
+      ctx.arcTo(x+w, y+h, x, y+h, rr);
+      ctx.arcTo(x, y+h, x, y, rr);
+      ctx.arcTo(x, y, x+w, y, rr);
+      ctx.closePath();
     }
 
-    function nextFrame(){
-      return new Promise(res => requestAnimationFrame(() => res()));
+    const giftCache = new Map();
+    function loadImageCached(url){
+      if(giftCache.has(url)) return giftCache.get(url);
+      const p = new Promise((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = () => resolve(null);
+        img.src = url;
+      });
+      giftCache.set(url, p);
+      return p;
     }
 
-    exportBtn.addEventListener('click', async () => {
+    function getCoverDrawParams(srcW, srcH, dstW, dstH){
+      const s = Math.max(dstW / srcW, dstH / srcH);
+      const drawnW = srcW * s;
+      const drawnH = srcH * s;
+      const offsetX = (dstW - drawnW) / 2;
+      const offsetY = (dstH - drawnH) / 2;
+      return { s, drawnW, drawnH, offsetX, offsetY };
+    }
+
+    async function exportOverlayPNG(){
+      exportBtn.disabled = true;
+      exportBtn.textContent = "⏳ Export…";
+      document.body.classList.add("exporting");
+
       try{
-        exportBtn.disabled = true;
-        exportBtn.textContent = "⏳ Export en cours...";
+        const [W, H] = exportRes.value.split("x").map(Number);
+        const canvas = document.createElement("canvas");
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext("2d");
 
-        // ✅ cache les aides d’édition
-        document.body.classList.add('exporting');
+        // ---- Draw background (image or current video frame)
+        ctx.clearRect(0,0,W,H);
+        if(state.bgType === "image" && state.bgImage?.naturalWidth){
+          const src = state.bgImage;
+          const cover = getCoverDrawParams(src.naturalWidth, src.naturalHeight, W, H);
+          ctx.drawImage(src, 0,0,src.naturalWidth,src.naturalHeight, cover.offsetX, cover.offsetY, cover.drawnW, cover.drawnH);
+        } else if(state.bgType === "video" && state.bgVideo?.videoWidth){
+          const src = state.bgVideo;
+          const cover = getCoverDrawParams(src.videoWidth, src.videoHeight, W, H);
+          ctx.drawImage(src, 0,0,src.videoWidth,src.videoHeight, cover.offsetX, cover.offsetY, cover.drawnW, cover.drawnH);
+        } else {
+          // fallback
+          ctx.fillStyle = "rgba(10,8,14,1)";
+          ctx.fillRect(0,0,W,H);
+        }
 
-        // ✅ laisse 2 frames pour être sûr que html2canvas capture SANS pseudo-elements
-        await nextFrame();
-        await nextFrame();
+        // vignette
+        const vign = ctx.createRadialGradient(W*0.5, H*0.35, Math.min(W,H)*0.12, W*0.5, H*0.5, Math.max(W,H)*0.75);
+        vign.addColorStop(0, "rgba(0,0,0,0)");
+        vign.addColorStop(1, "rgba(0,0,0,0.48)");
+        ctx.fillStyle = vign;
+        ctx.fillRect(0,0,W,H);
 
-        updateGlassAlignment();
-        await waitForImages(stage);
+        // ---- Grid layout (export)
+        const inset = 40;
+        const availW = W - inset*2;
+        const availH = H - inset*2;
 
-        const canvas = await html2canvas(stage, {
-          backgroundColor: null,
-          useCORS: true,
-          scale: 2
-        });
+        const cols = state.cols;
+        const rows = state.rows;
+        const gap = state.gap;
+        const labelSpace = 56;
 
-        const dataUrl = canvas.toDataURL('image/png');
-        const a = document.createElement('a');
+        let cell = Math.min(
+          Math.floor((availW - (cols-1)*gap)/cols),
+          Math.floor((availH - (rows-1)*gap)/rows - labelSpace)
+        );
+        cell = Math.max(110, Math.min(220, cell));
+
+        const gridW = cols*cell + (cols-1)*gap;
+        const gridH = rows*cell + (rows-1)*gap + rows*labelSpace;
+
+        const gridX = Math.round((W - gridW)/2);
+        const gridY = Math.round((H - gridH)/2);
+
+        // preload gifts
+        const uniqueGiftUrls = Array.from(new Set(state.cells.filter(Boolean)));
+        const imgs = await Promise.all(uniqueGiftUrls.map(loadImageCached));
+        const giftMap = new Map();
+        uniqueGiftUrls.forEach((u,i) => giftMap.set(u, imgs[i]));
+
+        // label style
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+
+        // helper: draw neon panel
+        function drawNeonPanel(x,y,size,r){
+          // shadow / base
+          ctx.save();
+          ctx.shadowColor = "rgba(0,0,0,0.55)";
+          ctx.shadowBlur = 22;
+          ctx.shadowOffsetY = 14;
+
+          roundRectPath(ctx, x, y, size, size, r);
+          ctx.fillStyle = "rgba(0,0,0,0.22)";
+          ctx.fill();
+          ctx.restore();
+
+          // diagonal subtle pattern
+          ctx.save();
+          roundRectPath(ctx, x, y, size, size, r);
+          ctx.clip();
+
+          ctx.globalAlpha = 0.16;
+          ctx.strokeStyle = "rgba(255,255,255,0.7)";
+          ctx.lineWidth = 3;
+
+          const step = 18;
+          for(let i=-size; i<size*2; i+=step){
+            ctx.beginPath();
+            ctx.moveTo(x+i, y);
+            ctx.lineTo(x+i+size, y+size);
+            ctx.stroke();
+          }
+
+          ctx.globalAlpha = 1;
+
+          // top shine
+          const g = ctx.createRadialGradient(x+size*0.40, y+size*0.10, size*0.08, x+size*0.40, y+size*0.10, size*0.70);
+          g.addColorStop(0, "rgba(255,255,255,0.20)");
+          g.addColorStop(1, "rgba(255,255,255,0)");
+          ctx.fillStyle = g;
+          ctx.fillRect(x, y, size, size);
+
+          ctx.restore();
+
+          // neon border
+          ctx.save();
+          // outer glow
+          ctx.shadowColor = "rgba(255,60,90,0.30)";
+          ctx.shadowBlur = 18;
+          roundRectPath(ctx, x, y, size, size, r);
+          ctx.strokeStyle = "rgba(255,60,90,0.35)";
+          ctx.lineWidth = 6;
+          ctx.stroke();
+          ctx.restore();
+
+          // inner crisp stroke
+          ctx.save();
+          roundRectPath(ctx, x, y, size, size, r);
+          const grad = ctx.createLinearGradient(x, y, x+size, y+size);
+          grad.addColorStop(0, "rgba(255,60,90,0.55)");
+          grad.addColorStop(0.5, "rgba(255,255,255,0.16)");
+          grad.addColorStop(1, "rgba(255,60,90,0.38)");
+          ctx.strokeStyle = grad;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // tiny highlight line
+          roundRectPath(ctx, x+1, y+1, size-2, size-2, Math.max(0,r-1));
+          ctx.strokeStyle = "rgba(255,255,255,0.10)";
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        // draw tiles
+        for(let row=0; row<rows; row++){
+          for(let col=0; col<cols; col++){
+            const i = row*cols + col;
+            const x = gridX + col*(cell+gap);
+            const y = gridY + row*(cell+gap+labelSpace);
+
+            drawNeonPanel(x,y,cell,state.round);
+
+            // gift
+            const url = state.cells[i];
+            if(url){
+              const img = giftMap.get(url);
+              if(img){
+                const pad = cell * 0.16;
+                const gx = x + pad;
+                const gy = y + pad;
+                const gw = cell - pad*2;
+                const gh = cell - pad*2;
+
+                ctx.save();
+                ctx.shadowColor = "rgba(0,0,0,0.60)";
+                ctx.shadowBlur = 18;
+                ctx.shadowOffsetY = 12;
+                ctx.drawImage(img, gx, gy, gw, gh);
+                ctx.restore();
+              }
+            }
+
+            // label (stroke-like fake)
+            const label = (state.labels[i] || "").trim();
+            if(label){
+              const ly = y + cell + 8;
+              const fontSize = 28; // OK for 1080p; will scale naturally via render size
+              ctx.font = `900 ${fontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial`;
+              const maxW = cell;
+              const lines = wrapText(ctx, label.toUpperCase(), maxW, 2);
+
+              // "stroke"
+              ctx.lineWidth = 10;
+              ctx.strokeStyle = "rgba(0,0,0,0.92)";
+              ctx.fillStyle = "rgba(255,255,255,0.96)";
+
+              let yy = ly;
+              for(const line of lines){
+                ctx.strokeText(line, x + cell/2, yy);
+                ctx.fillText(line, x + cell/2, yy);
+                yy += fontSize * 1.05;
+              }
+            }
+          }
+        }
+
+        // download
+        const dataUrl = canvas.toDataURL("image/png");
+        const a = document.createElement("a");
         a.href = dataUrl;
         a.download = `overlay-akatsuki-${Date.now()}.png`;
         document.body.appendChild(a);
@@ -1249,26 +1350,49 @@
         a.remove();
 
       } catch(err){
-        alert("Export impossible (vérifie que GitHub Pages sert bien les images).");
         console.error(err);
+        alert("Export impossible. Vérifie que les images cadeaux existent bien en racine.");
       } finally {
-        document.body.classList.remove('exporting');
+        document.body.classList.remove("exporting");
         exportBtn.disabled = false;
         exportBtn.textContent = "Exporter en PNG";
       }
-    });
+    }
 
-    // --------- Init
+    function wrapText(ctx, text, maxWidth, maxLines){
+      const words = text.split(/\s+/).filter(Boolean);
+      const lines = [];
+      let line = "";
+      for(const w of words){
+        const test = line ? (line + " " + w) : w;
+        const width = ctx.measureText(test).width;
+        if(width <= maxWidth){
+          line = test;
+        } else {
+          if(line) lines.push(line);
+          line = w;
+          if(lines.length >= maxLines-1) break;
+        }
+      }
+      if(line && lines.length < maxLines) lines.push(line);
+      return lines;
+    }
+
+    exportBtn.addEventListener("click", exportOverlayPNG);
+
+    // -------------------------
+    // Init
     renderGiftSelect();
 
-    state.blur = Number(blurRange.value);
     state.round = Number(roundRange.value);
+    state.gap = Number(gapRange.value);
     setCSSVars();
 
     setLayout(layout.value);
     renderGiftPreview();
     renderGrid();
     applySizingForLayout();
+
   </script>
 </body>
 </html>
