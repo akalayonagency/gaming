@@ -24,10 +24,14 @@
       --cellSize: 150px;
       --r: 22px;
 
-      /* NEW: panel controls */
+      /* panel controls */
       --panelColor: 255, 60, 90; /* rgb only */
       --panelAlpha: .22;         /* density */
       --hudAlpha: .85;
+
+      /* bounce controls (screen + renderer) */
+      --bounceAmp: 8px;
+      --bounceSpeed: 1.3;
     }
 
     *{ box-sizing:border-box; }
@@ -159,16 +163,43 @@
     }
     input[type="range"]{ width: 100%; }
 
+    /* ✅ DROPDOWNS PLUS VISIBLES (fond noir + options noires) */
     select{
       width: 100%;
-      padding: 10px 12px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,60,90,.28);
+      padding: 11px 42px 11px 12px;
+      background: rgba(0,0,0,.78);
+      border: 1px solid rgba(255,60,90,.48);
       border-radius: 14px;
-      color: var(--text);
+      color: rgba(255,255,255,.96);
       outline:none;
-      box-shadow: 0 0 0 3px rgba(255,60,90,.08);
-      font-weight: 800;
+      box-shadow: 0 0 0 3px rgba(255,60,90,.10);
+      font-weight: 900;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      position: relative;
+      background-image:
+        linear-gradient(45deg, transparent 50%, rgba(255,255,255,.85) 50%),
+        linear-gradient(135deg, rgba(255,255,255,.85) 50%, transparent 50%),
+        linear-gradient(to right, rgba(255,60,90,.18), rgba(255,60,90,.06));
+      background-position:
+        calc(100% - 18px) 18px,
+        calc(100% - 12px) 18px,
+        100% 0;
+      background-size:
+        6px 6px,
+        6px 6px,
+        52px 100%;
+      background-repeat: no-repeat;
+    }
+    select:focus{
+      border-color: rgba(255,60,90,.70);
+      box-shadow: 0 0 0 4px rgba(255,60,90,.16);
+    }
+    /* Les <option> sont très dépendantes du navigateur, mais ça aide beaucoup */
+    select option{
+      background: #0b0a10;
+      color: rgba(255,255,255,.95);
     }
 
     .hint{
@@ -267,7 +298,6 @@
       filter: saturate(1.06) contrast(1.03);
     }
 
-    /* subtle cinematic */
     .vignette{
       position:absolute; inset:0;
       background:
@@ -283,7 +313,6 @@
       mix-blend-mode: overlay;
     }
 
-    /* GRID */
     .grid{
       position:absolute;
       inset: 40px;
@@ -305,7 +334,6 @@
       user-select:none;
     }
 
-    /* DINGUERIE NEON HUD PANEL */
     .cell{
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -325,7 +353,6 @@
         0 0 0 1px rgba(var(--panelColor), .10) inset;
     }
 
-    /* diagonal micro pattern */
     .cell::before{
       content:"";
       position:absolute; inset:0;
@@ -340,7 +367,6 @@
       pointer-events:none;
     }
 
-    /* animated scanline */
     .scanline{
       position:absolute;
       left:-40%;
@@ -360,17 +386,14 @@
       100%{ transform: translateY(170%) rotate(12deg); opacity: 0; }
     }
 
-    /* neon frame with pulse */
     .neonFrame{
       position:absolute; inset:0;
       border-radius: var(--r);
       pointer-events:none;
-
       box-shadow:
         inset 0 0 0 2px rgba(var(--panelColor), .34),
         inset 0 0 0 1px rgba(255,255,255,.10),
         0 0 22px rgba(var(--panelColor), .14);
-
       animation: pulse 1.9s ease-in-out infinite;
     }
     @keyframes pulse{
@@ -388,7 +411,6 @@
       }
     }
 
-    /* tiny corner ticks */
     .ticks{
       position:absolute; inset:0;
       pointer-events:none;
@@ -409,7 +431,6 @@
       transform: rotate(180deg);
     }
 
-    /* micro glitch strip */
     .glitch{
       position:absolute;
       left:0; right:0;
@@ -442,12 +463,24 @@
       justify-content:center;
       pointer-events:none;
       z-index: 4;
+      transform: translateY(0px);
     }
     .cell .giftInCell img{
       width: 100%;
       height: 100%;
       object-fit: contain;
       filter: drop-shadow(0 18px 18px rgba(0,0,0,.58));
+      transform: translateY(0);
+      will-change: transform;
+    }
+
+    /* ✅ Effet rebond (activable via class sur body) */
+    body.bounce-on .cell .giftInCell img{
+      animation: bounceGift calc(1s / var(--bounceSpeed)) ease-in-out infinite;
+    }
+    @keyframes bounceGift{
+      0%,100%{ transform: translateY(0); }
+      50%{ transform: translateY(calc(-1 * var(--bounceAmp))); }
     }
 
     .cell .empty{
@@ -464,7 +497,6 @@
       z-index: 4;
     }
 
-    /* Label */
     .cellLabel{
       width: 100%;
       text-align:center;
@@ -497,7 +529,6 @@
       text-shadow: none;
     }
 
-    /* edit helper (screen only) */
     body:not(.exporting) .cellLabel::before{
       content:"";
       position:absolute;
@@ -539,6 +570,71 @@
       background: rgba(0,0,0,.18);
       padding: 6px;
     }
+
+    .switchRow{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.14);
+    }
+    .switchRow .left{
+      display:flex; flex-direction:column; gap: 2px;
+    }
+    .switchRow .left .big{
+      font-weight: 950;
+      font-size: 12px;
+      color: rgba(255,255,255,.88);
+    }
+    .switchRow .left .small{
+      font-size: 12px;
+      color: rgba(255,255,255,.66);
+    }
+    .toggle{
+      width: 44px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.35);
+      position:relative;
+      cursor:pointer;
+      flex: 0 0 auto;
+      box-shadow: 0 0 0 3px rgba(255,60,90,.06);
+    }
+    .toggle::after{
+      content:"";
+      position:absolute;
+      top: 3px; left: 3px;
+      width: 20px; height: 20px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.92);
+      box-shadow: 0 8px 16px rgba(0,0,0,.35);
+      transition: transform .18s ease;
+    }
+    .toggle.is-on{
+      border-color: rgba(255,60,90,.55);
+      background: rgba(255,60,90,.18);
+    }
+    .toggle.is-on::after{
+      transform: translateX(18px);
+      background: rgba(255,255,255,.98);
+    }
+
+    .status{
+      font-size: 12px;
+      color: rgba(255,255,255,.78);
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.14);
+      display:none;
+      margin-top: 10px;
+      line-height: 1.35;
+    }
+    .status.show{ display:block; }
   </style>
 </head>
 
@@ -614,6 +710,28 @@
       </div>
 
       <div class="section">
+        <label>🌀 3bis) Effet cadeaux (rebond)</label>
+
+        <div class="switchRow">
+          <div class="left">
+            <div class="big">Rebond en boucle</div>
+            <div class="small">Visible à l’écran + sur la vidéo/PNG</div>
+          </div>
+          <div class="toggle" id="bounceToggle" role="switch" aria-checked="false" tabindex="0"></div>
+        </div>
+
+        <div style="margin-top:12px;">
+          <label>⬆️ Amplitude : <span id="bounceAmpVal">8</span>px</label>
+          <input id="bounceAmp" type="range" min="0" max="24" step="1" value="8" />
+        </div>
+
+        <div style="margin-top:12px;">
+          <label>⏱️ Vitesse : <span id="bounceSpeedVal">1.30</span></label>
+          <input id="bounceSpeed" type="range" min="0.5" max="3" step="0.05" value="1.3" />
+        </div>
+      </div>
+
+      <div class="section">
         <label>⚙️ 4) Réglages</label>
 
         <label style="margin-top:8px;">Disposition</label>
@@ -655,9 +773,12 @@
           <button class="btn record" id="recordBtn">⏺️ Enregistrer vidéo</button>
         </div>
 
+        <div class="status" id="statusBox"></div>
+
         <div class="hint">
           ✅ PNG : export propre.<br/>
-          ✅ Vidéo : WEBM (Start/Stop). La vidéo contient le fond + l’overlay animé.
+          ✅ Vidéo : WEBM (Start/Stop). La vidéo contient le fond + l’overlay animé.<br/>
+          ℹ️ Si rien ne se passe : essaie Chrome/Edge et lance le fichier via un serveur (pas en file://).
         </div>
       </div>
     </div>
@@ -887,7 +1008,12 @@
 
       panelRgb: [255, 60, 90],
       panelAlpha: 0.22,
-      hudAlpha: 0.85
+      hudAlpha: 0.85,
+
+      // ✅ bounce (screen + renderer)
+      bounceEnabled: false,
+      bounceAmp: 8,       // px
+      bounceSpeed: 1.3    // multiplier
     };
 
     // DOM
@@ -920,13 +1046,29 @@
     const hud = document.getElementById("hud");
     const hudVal = document.getElementById("hudVal");
 
+    const bounceToggle = document.getElementById("bounceToggle");
+    const bounceAmp = document.getElementById("bounceAmp");
+    const bounceAmpVal = document.getElementById("bounceAmpVal");
+    const bounceSpeed = document.getElementById("bounceSpeed");
+    const bounceSpeedVal = document.getElementById("bounceSpeedVal");
+
     const resetGridBtn = document.getElementById("resetGrid");
     const exportBtn = document.getElementById("exportPng");
     const exportRes = document.getElementById("exportRes");
     const recordBtn = document.getElementById("recordBtn");
+    const statusBox = document.getElementById("statusBox");
 
     // renderer resources
     const giftCache = new Map();
+
+    function showStatus(msg){
+      statusBox.textContent = msg;
+      statusBox.classList.add("show");
+    }
+    function hideStatus(){
+      statusBox.classList.remove("show");
+      statusBox.textContent = "";
+    }
 
     function setCSSVars(){
       document.documentElement.style.setProperty("--cols", state.cols);
@@ -937,10 +1079,20 @@
       document.documentElement.style.setProperty("--hudAlpha", String(state.hudAlpha));
       document.documentElement.style.setProperty("--panelColor", `${state.panelRgb[0]}, ${state.panelRgb[1]}, ${state.panelRgb[2]}`);
 
+      document.documentElement.style.setProperty("--bounceAmp", state.bounceAmp + "px");
+      document.documentElement.style.setProperty("--bounceSpeed", String(state.bounceSpeed));
+
+      document.body.classList.toggle("bounce-on", !!state.bounceEnabled);
+      bounceToggle.classList.toggle("is-on", !!state.bounceEnabled);
+      bounceToggle.setAttribute("aria-checked", String(!!state.bounceEnabled));
+
       roundVal.textContent = state.round;
       gapVal.textContent = state.gap;
       densityVal.textContent = state.panelAlpha.toFixed(2);
       hudVal.textContent = state.hudAlpha.toFixed(2);
+
+      bounceAmpVal.textContent = state.bounceAmp;
+      bounceSpeedVal.textContent = state.bounceSpeed.toFixed(2);
     }
 
     function parseCoinsFromName(name){
@@ -1232,11 +1384,9 @@
       return lines;
     }
 
-    // ---- Canvas renderer (for PNG export + video recording)
     function drawNeonPanel(ctx, x, y, size, r, rgb, alpha, hudAlpha, t){
       const [R,G,B] = rgb;
 
-      // base panel
       ctx.save();
       roundRectPath(ctx, x, y, size, size, r);
       ctx.clip();
@@ -1253,14 +1403,12 @@
       ctx.fillStyle = g2;
       ctx.fillRect(x,y,size,size);
 
-      // dark base
       const lg = ctx.createLinearGradient(x,y,x,y+size);
       lg.addColorStop(0, `rgba(0,0,0,0.16)`);
       lg.addColorStop(1, `rgba(0,0,0,0.34)`);
       ctx.fillStyle = lg;
       ctx.fillRect(x,y,size,size);
 
-      // diagonal pattern
       ctx.globalAlpha = Math.min(1, alpha*0.9);
       ctx.strokeStyle = "rgba(255,255,255,0.7)";
       ctx.lineWidth = 2.5;
@@ -1273,7 +1421,6 @@
       }
       ctx.globalAlpha = 1;
 
-      // scanline (animated)
       const scanY = ( (t*0.35) % 1 ) * (size*1.7) - size*0.6;
       ctx.save();
       ctx.globalAlpha = hudAlpha * 0.40;
@@ -1287,7 +1434,6 @@
       ctx.fillRect(-size*0.6, scanY, size*2.2, size*0.22);
       ctx.restore();
 
-      // tiny glitch strip occasionally
       const glitchOn = (Math.sin(t*2.1 + (x+y)*0.001) > 0.985);
       if(glitchOn){
         ctx.globalAlpha = hudAlpha * 0.55;
@@ -1298,12 +1444,10 @@
 
       ctx.restore();
 
-      // border pulse
       const pulse = 0.5 + 0.5*Math.sin(t*2.7 + (x+y)*0.003);
       const glowA = (0.12 + pulse*0.12) * hudAlpha;
       const strokeA = (0.30 + pulse*0.22) * hudAlpha;
 
-      // glow outer
       ctx.save();
       ctx.shadowColor = `rgba(${R},${G},${B},${glowA})`;
       ctx.shadowBlur = 18 + pulse*10;
@@ -1313,7 +1457,6 @@
       ctx.stroke();
       ctx.restore();
 
-      // crisp inner stroke
       ctx.save();
       roundRectPath(ctx, x, y, size, size, r);
       const grad = ctx.createLinearGradient(x, y, x+size, y+size);
@@ -1324,17 +1467,15 @@
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // corner ticks
       ctx.strokeStyle = `rgba(${R},${G},${B},${0.55*hudAlpha})`;
       ctx.lineWidth = 2;
       const tick = Math.max(12, size*0.10);
-      // top-left
       ctx.beginPath();
       ctx.moveTo(x+10, y+10+tick);
       ctx.lineTo(x+10, y+10);
       ctx.lineTo(x+10+tick, y+10);
       ctx.stroke();
-      // bottom-right
+
       ctx.beginPath();
       ctx.moveTo(x+size-10, y+size-10-tick);
       ctx.lineTo(x+size-10, y+size-10);
@@ -1393,7 +1534,6 @@
         ctx.fillRect(0,0,W,H);
       }
 
-      // vignette
       const vign = ctx.createRadialGradient(W*0.5, H*0.35, Math.min(W,H)*0.12, W*0.5, H*0.5, Math.max(W,H)*0.75);
       vign.addColorStop(0, "rgba(0,0,0,0)");
       vign.addColorStop(1, "rgba(0,0,0,0.50)");
@@ -1406,12 +1546,14 @@
       if(!txt) return;
 
       const ly = y + cell + 8;
-      const fontSize = Math.round(cell * 0.17); // scales with cell
+      const fontSize = Math.round(cell * 0.17);
       ctx.font = `900 ${fontSize}px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial`;
       const maxW = cell;
 
       const lines = wrapText(ctx, txt.toUpperCase(), maxW, 2);
 
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
       ctx.lineWidth = Math.max(6, fontSize * 0.32);
       ctx.strokeStyle = "rgba(0,0,0,0.92)";
       ctx.fillStyle = "rgba(255,255,255,0.96)";
@@ -1424,6 +1566,14 @@
       }
     }
 
+    function bounceOffsetPx(tSec, i){
+      if(!state.bounceEnabled) return 0;
+      const phase = (i * 0.55) % (Math.PI * 2);
+      const s = Math.sin((tSec * 2 * Math.PI * state.bounceSpeed) + phase);
+      const amp = state.bounceAmp;
+      return -Math.max(0, s) * amp; // un rebond "vers le haut"
+    }
+
     async function renderToCanvas(canvas, tSec){
       const ctx = canvas.getContext("2d");
       const W = canvas.width;
@@ -1434,7 +1584,6 @@
       const layout = computeGridLayout(W, H);
       const giftMap = await buildGiftMap();
 
-      // draw grid
       for(let row=0; row<layout.rows; row++){
         for(let col=0; col<layout.cols; col++){
           const i = row*layout.cols + col;
@@ -1443,7 +1592,6 @@
 
           drawNeonPanel(ctx, x, y, layout.cell, state.round, state.panelRgb, state.panelAlpha, state.hudAlpha, tSec);
 
-          // gift
           const url = state.cells[i];
           if(url){
             const img = giftMap.get(url);
@@ -1454,11 +1602,13 @@
               const gw = layout.cell - pad*2;
               const gh = layout.cell - pad*2;
 
+              const by = bounceOffsetPx(tSec, i);
+
               ctx.save();
               ctx.shadowColor = "rgba(0,0,0,0.62)";
               ctx.shadowBlur = 18;
               ctx.shadowOffsetY = 12;
-              ctx.drawImage(img, gx, gy, gw, gh);
+              ctx.drawImage(img, gx, gy + by, gw, gh);
               ctx.restore();
             }
           }
@@ -1472,6 +1622,7 @@
       exportBtn.disabled = true;
       exportBtn.textContent = "⏳ Export…";
       document.body.classList.add("exporting");
+      hideStatus();
 
       try{
         const [W, H] = exportRes.value.split("x").map(Number);
@@ -1498,7 +1649,7 @@
       }
     }
 
-    // ---- VIDEO RECORDING (WEBM)
+    // ✅ VIDEO RECORDING (WEBM) - fiabilisé + messages
     let recorder = null;
     let recordStream = null;
     let recordChunks = [];
@@ -1515,8 +1666,29 @@
       return candidates.find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || "";
     }
 
+    function downloadBlob(blob, filename){
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 7000);
+    }
+
     async function startRecording(){
       if(recording) return;
+      hideStatus();
+
+      if(!window.MediaRecorder){
+        alert("MediaRecorder non supporté. Essaie Chrome/Edge.");
+        return;
+      }
+      if(!HTMLCanvasElement.prototype.captureStream){
+        alert("captureStream non supporté. Essaie Chrome/Edge.");
+        return;
+      }
 
       const [W, H] = exportRes.value.split("x").map(Number);
       recordCanvas = document.createElement("canvas");
@@ -1528,33 +1700,52 @@
 
       const mime = pickSupportedMime();
       try{
-        recorder = new MediaRecorder(recordStream, mime ? { mimeType: mime } : undefined);
+        recorder = new MediaRecorder(recordStream, mime ? { mimeType: mime, videoBitsPerSecond: 8_000_000 } : { videoBitsPerSecond: 8_000_000 });
       } catch(e){
-        alert("Enregistrement vidéo non supporté sur ce navigateur (MediaRecorder). Essaie Chrome/Edge.");
+        console.error(e);
+        alert("Enregistrement vidéo non supporté (MediaRecorder). Essaie Chrome/Edge.");
         return;
       }
 
       recordChunks = [];
       recorder.ondataavailable = (e) => { if(e.data && e.data.size) recordChunks.push(e.data); };
+
+      recorder.onerror = (e) => {
+        console.error("Recorder error", e);
+        showStatus("❌ Erreur MediaRecorder. Essaie Chrome/Edge et ouvre la page via un serveur (pas file://).");
+      };
+
       recorder.onstop = () => {
-        const blob = new Blob(recordChunks, { type: recorder.mimeType || "video/webm" });
-        const url = URL.createObjectURL(blob);
-
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `overlay-akatsuki-${Date.now()}.webm`;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
+        try{
+          const type = recorder?.mimeType || "video/webm";
+          const blob = new Blob(recordChunks, { type });
+          if(!blob.size){
+            showStatus("❌ Vidéo vide. Essaie Chrome/Edge et ouvre via un serveur (http://).");
+            return;
+          }
+          downloadBlob(blob, `overlay-akatsuki-${Date.now()}.webm`);
+          showStatus("✅ Vidéo téléchargée !");
+        } catch(err){
+          console.error(err);
+          showStatus("❌ Impossible de finaliser la vidéo.");
+        }
       };
 
       recording = true;
       recordBtn.classList.add("is-on");
       recordBtn.textContent = "⏹️ Stop vidéo";
+      showStatus("⏺️ Enregistrement en cours… (clique Stop pour télécharger)");
 
-      recorder.start(200); // chunk every 200ms
+      try{
+        recorder.start(200);
+      } catch(e){
+        console.error(e);
+        showStatus("❌ Démarrage enregistrement impossible.");
+        recording = false;
+        recordBtn.classList.remove("is-on");
+        recordBtn.textContent = "⏺️ Enregistrer vidéo";
+        return;
+      }
 
       const loop = async () => {
         if(!recording) return;
@@ -1566,17 +1757,27 @@
 
     function stopRecording(){
       if(!recording) return;
+
       recording = false;
       recordBtn.classList.remove("is-on");
       recordBtn.textContent = "⏺️ Enregistrer vidéo";
+      showStatus("⏳ Finalisation… téléchargement imminent");
 
       if(rafId) cancelAnimationFrame(rafId);
       rafId = null;
 
-      try{ recorder.stop(); } catch(e){}
-      recorder = null;
-      recordStream = null;
-      recordCanvas = null;
+      try{
+        if(recorder && recorder.state !== "inactive"){
+          recorder.stop();
+        }
+      } catch(e){
+        console.error(e);
+        showStatus("❌ Stop impossible. Essaie de relancer la page.");
+      } finally {
+        recorder = null;
+        recordStream = null;
+        recordCanvas = null;
+      }
     }
 
     // Controls wiring
@@ -1633,7 +1834,7 @@
     });
 
     panelColor.addEventListener("input", (e) => {
-      const hex = e.target.value; // #rrggbb
+      const hex = e.target.value;
       const r = parseInt(hex.slice(1,3), 16);
       const g = parseInt(hex.slice(3,5), 16);
       const b = parseInt(hex.slice(5,7), 16);
@@ -1648,6 +1849,29 @@
 
     hud.addEventListener("input", (e) => {
       state.hudAlpha = Number(e.target.value);
+      setCSSVars();
+    });
+
+    // ✅ bounce controls
+    function toggleBounce(){
+      state.bounceEnabled = !state.bounceEnabled;
+      setCSSVars();
+    }
+    bounceToggle.addEventListener("click", toggleBounce);
+    bounceToggle.addEventListener("keydown", (e) => {
+      if(e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        toggleBounce();
+      }
+    });
+
+    bounceAmp.addEventListener("input", (e) => {
+      state.bounceAmp = Number(e.target.value);
+      setCSSVars();
+    });
+
+    bounceSpeed.addEventListener("input", (e) => {
+      state.bounceSpeed = Number(e.target.value);
       setCSSVars();
     });
 
